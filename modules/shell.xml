@@ -1,0 +1,27 @@
+<xvoice>
+    <vocab name='shell' enableOn='shell'> <![CDATA[
+        <<root>> = push directory ->      <key char='pd '/>
+            |pop directory ->           <key char='popd\\r'/>
+            |directory ->           <key char='ls\\r'/>
+            |copy ->           <key char='cp '/>
+            |home directory ->           <key char='~/'/>
+            |edit ->                <key char='vi '/>
+            |less ->        <key char='less ' />
+            |locate ->        <key char='locate ' />
+            |change directory ->        <key char='cd ' />
+            |directory stack ->        <key char='dirs\\r' />
+            |parent ->        <key char='\.\./' />
+            |history ->        <key char='h\\r' />
+            |pipe ->        <key char='\|' />
+            |man  ->        <key char='man ' />
+            |mutt ->        <key char='mutt\\r' />
+            |fetch mail ->        <key char='fetchmail\\r' />
+            |exit ->        <key char='exit' />
+            |tail ->        <key char='tail' />
+            |system log ->        <key char='/var/log/messages' />
+            |login ->        <key char='ssh ' />
+            |erase line ->          <key char='u' control='true'/>
+            |emacs ->          <key char='emacs\\r'/>
+            |shell commands off -> <grammar name='shell' action='off' />.
+    ]]> </vocab>
+</xvoice>

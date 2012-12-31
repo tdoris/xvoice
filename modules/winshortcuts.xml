@@ -1,0 +1,10 @@
+<xvoice>
+    <application name='windowmanagershortcuts' expr='windowmanagershortcuts'> <![CDATA[
+        INCLUDE "numbers.bnf"
+        <<root>> = next window ->       <key char='\\t' alt='true'/>
+            | last window ->            <key char='\\t' alt='true' shift='true'/>
+            | bring up browser -> <call command='mozilla' expr='Mozilla'/>
+            | move to workspace {<raw-number>} ->  <key char='{1}' alt='true'/>
+            | icon if eye window ->     <key char='m' alt='true'/> .
+    ]]> </application>
+</xvoice>

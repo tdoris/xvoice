@@ -1,0 +1,14 @@
+<xvoice>
+
+  <!-- These words are available in every application. -->
+  <application name='general' expr='general' alwaysOn='true'><![CDATA[
+    INCLUDE "numbers.bnf"
+    INCLUDE "keys.bnf"
+	<<root>> = type {<number>} -> {1}
+        | type {<modanychar>} -> {1} 
+        | type {<real-number>} -> {1}
+        | type {<multichar>} -> {1}
+        .
+  ]]> </application>
+
+</xvoice>

@@ -1,0 +1,15 @@
+(probably an incomplete list)
+
+- more grammars
+- "what can i say?" command to print example voice commands
+- add console support
+- support for different keyboards/character sets
+- add wm dock ui
+- error checking in xml (currently we segfault if expr is missing, for example)
+- double check async processing concerns, especially if we may be getting grammar
+  requests from the window list & the voice engine at the same time.
+- better gnome autoconf checking?
+
+- Add support for gnome enlightenment key shortcuts (switch windows/desktops)
+- Add support home/insert/functionkeys etc.
+- Add proper correction support (This will not be possible until IBM build it into the Linux ViaVoice engine...)

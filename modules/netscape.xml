@@ -1,0 +1,31 @@
+<xvoice>
+  <application name='netscape' expr='Netscape.*'><![CDATA[
+        <<root>> =
+                 back ->        <key char='&Left;' alt='true'/>
+                |forward ->     <key char='&Right;' alt='true'/>
+                |open page ->   <key char='o' alt='true'/>
+                |close ->       <key char='w' control='true'/>
+                |new window ->  <key char='n' alt='true'/>
+                |find ->        <key char='f' alt='true'/>
+                |find again ->  <key char='g' alt='true'/>
+                |book mark ->   <key char='k' alt='true'/>
+                |reload ->      <key char='r' alt='true'/>
+                |print ->       <key char='p' alt='true'/><pause/>
+                                <key char='\\r'/>
+                |home ->        <mouse x='237' y='55' origin='window'
+button='1' action='click'  />
+                |goo gull ->    <key char='o' alt='true'/><pause/>
+                                <key char='ak' control='true' />
+                                <key char='google\.com\\r'/>
+                |x voice ->     <key char='o' alt='true'/><pause/>
+                                <key char='ak' control='true' />
+                                <key
+char='http://xvoice\.sourceforge\.net\\r'/>
+                |slash dot ->   <key char='o' alt='true'/><pause/>
+                                <key char='ak' control='true' />
+                                <key char='slashdot\.org\\r'/>
+                | click    ->   <mouse button=1 action="click">
+                | middle   ->   <mouse button=2 action="click">
+
+.  ]]>   </application>
+</xvoice>

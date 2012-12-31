@@ -1,0 +1,48 @@
+<xvoice>
+  <application name='xvoicexml' expr='X?emacs.*xml' before='emacs'><![CDATA[
+    INCLUDE "numbers.bnf"
+    INCLUDE "keys.bnf"
+    INCLUDE "emacsediting.bnf"
+    <xvoicestuff> =
+                    add key {<keychar> | <alphabet> | <one-digit>} 
+                             -> <key char='e' control='true'/>
+                             <key char='&Return;'/>
+                             <key char='u' control='true'/>
+                             <key char='29 '/>
+                             <key char='&lt;'/>
+                             <key char="key char='{1}'/"/>
+                             <key char='&gt;'/>
+                             <key char='bbb' control='true'/>
+
+                  | add control key {<keychar> | <alphabet> | <one-digit>} 
+                             -> <key char='e' control='true'/>
+                             <key char='&Return;'/>
+                             <key char='u' control='true'/>
+                             <key char='29 '/>
+                             <key char='&lt;'/>
+                             <key char="key char='{1}' control='true'/"/>
+                             <key char='&gt;'/>
+                             <key char='u' control='true'/>
+                             <key char='18b' control='true'/>
+
+                  | add alt key {<keychar> | <alphabet> | <one-digit>} 
+                             -> <key char='e' control='true'/>
+                             <key char='u' control='true'/>
+                             <key char='29 '/>
+                             <key char='&lt;'/>
+                             <key char="key char='{1}' alt='true'/"/>
+                             <key char='&gt;'/>
+                             <key char='u' control='true'/>
+                             <key char='14b' control='true'/>
+
+                  | add mapping -> <key char='e' control='true'/>
+                             <key char='&Return;'/>
+                             <key char='u' control='true'/>
+                             <key char='18 \| -'/>
+                             <key char='&gt;'/>
+                             <key char='u' control='true'/>
+                             <key char='3b' control='true'/>
+                  .
+    <<root>> = <xvoicestuff> | <emacsediting> | <multichar>.
+    ]]> </application>
+</xvoice>

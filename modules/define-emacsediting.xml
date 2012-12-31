@@ -1,0 +1,116 @@
+<xvoice>
+    <define name='emacsediting'> <![CDATA[
+            <emacsediting> =
+		 beginning of line ->	<key char='a' control='true'/>
+		|end of line ->	<key char='e' control='true'/>
+                |delete character -> <key char='d' control='true'/>
+                |delete {<raw-number>} characters ->  
+                         <key char='u' control='true'/>
+                         <key char='{1}'/>
+                         <key char='d' control='true'/>
+                | backspace -> <key char='\\b'>
+                | backspace {<raw-number>} characters ->  
+                         <key char='u' control='true'/>
+                         <key char='{1}'/>
+                         <key char='\\b'/>
+		|delete word ->	<key char='d' alt='true'/>
+		|delete {<raw-number>} words ->	
+                         <key char='u' control='true'/>
+                         <key char='{1}'/>
+                         <key char='d' alt='true'/>
+		|(kill|delete last) word ->	<key char='\\b' alt='true'/>
+                |kill {<raw-number>} words ->  
+                         <repeat count='{1}'> <key char='\\b' alt='true'/>   </repeat>
+                |kill this line -> 
+                             <key char='a' control='true'/>
+                             <key char='k' control='true'/>
+		|kill line ->	<key char='k' control='true'/>
+		|kill {<raw-number>} lines -> <repeat count='{1}'> 
+                     <key char='k' control='true'/>
+                     </repeat>
+                |left {<number>} words -> <key char='u' control='true'/>
+                     {1} <key char='b' alt='true'/>
+                |right {<number>} words -> <key char='u' control='true'/>
+                     {1} <key char='f' alt='true'/>
+
+                |(previous word|left one word) -> <key char='b' alt='true'/>
+                |(next word|right one word) -> <key char='f' alt='true'/>
+		|transpose ->	<key char='t' control='true'/>
+
+                  | capitalize word ->
+                  <key char='c' alt='true'/>
+                  | capitalize last word ->
+                  <key char='b' alt='true'/>
+                  <key char='c' alt='true'/>
+                  | capitalize last sentence ->
+                  <key char='a' alt='true'/>
+                  <key char='c' alt='true'/>
+                  <key char='e' alt='true'/>
+
+                  | uppercase word ->
+                  <key char='u' alt='true'/>
+                  | uppercase last word ->
+                  <key char='b' alt='true'/>
+                  <key char='u' alt='true'/>
+                  | uppercase last sentence ->
+                  <key char='a' alt='true'/>
+                  <key char='u' alt='true'/>
+                  <key char='e' alt='true'/>
+
+                  | lowercase word ->
+                  <key char='l' alt='true'/>
+                  | lowercase last word ->
+                  <key char='b' alt='true'/>
+                  <key char='l' alt='true'/>
+                  | lowercase last sentence ->
+                  <key char='a' alt='true'/>
+                  <key char='l' alt='true'/>
+                  <key char='e' alt='true'/>
+
+		|forward sentence ->	<key char='e' alt='true'/>
+		|forward word ->	<key char='f' alt='true'/>
+
+		|backward sentence ->	<key char='a' alt='true'/>
+		|backward word ->	<key char='b' alt='true'/>
+
+                |left {<number>} sentences -> <key char='u' control='true'/>
+                     {1} <key char='a' alt='true'/>
+                |right {<number>} sentences -> <key char='u' control='true'/>
+                     {1} <key char='e' alt='true'/>
+
+		|search ->	<key char='s' control='true'/>
+		|search backward ->	<key char='r' control='true'/>
+		|query replace ->	<key char='%' alt='true'/>
+
+		|go to line ->	<key char='g' alt='true'/>
+		|scroll up ->	<key char='v' control='true'/>
+		|scroll down ->	<key char='v' alt='true'/>
+
+                | set mark ->   <key char=' ' control='true' />
+		|kill region ->	<key char='w' control='true'/>
+		|yank ->	<key char='y' control='true'/>
+
+		|kill rectangle -> <key char='x' control='true'/>
+                             <key char='rk'/>
+                  | yank rectangle ->
+                             <key char='x' control='true'/>
+                             <key char='ry'/>
+                  | open rectangle ->
+                             <key char='x' control='true'/>
+                             <key char='ro'/>
+
+		|switch to buffer ->	<key char='x' control='true'/>
+			<key char='b' />
+		|save buffer ->	<key char='x' control='true'/>
+			<key char='s' control='true'/>
+
+		|expand ->	<key char='/' alt='true'/>
+                |reformat paragraph -> <key char='q' alt='true'>
+		|recenter ->	<key char='l' control='true'/>
+		|open line ->	<key char='o' control='true'/>
+		|new line ->	<key char='m' control='true'/>
+
+		|keyboard quit ->	<key char='g' control='true'/>
+		|undo ->	<key char='_' control='true'/>
+.   ]]> </define>
+</xvoice>

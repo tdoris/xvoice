@@ -1,0 +1,5 @@
+<xvoice>
+  <!--  This file is obsolete.  Pluggable modules are used instead,
+  and see the modules/*.xml files for further information, as well as
+  the COMMANDS documentation file -->
+</xvoice>

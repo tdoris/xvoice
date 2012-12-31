@@ -1,0 +1,70 @@
+<xvoice>
+    <vocab name='Web Design' enableOn="web design"> <![CDATA[
+        <<root>> =
+            start html -> <key char='&lt;html&gt;'/>
+            |end html -> <key char='&lt;\\\\html&gt;'/>
+            |start head -> <key char='&lt;head&gt;'/>
+            |end head -> <key char='&lt;\\\\head&gt;'/>
+            |start title -> <key char='&lt;title&gt;'/>
+            |end title -> <key char='&lt;\\\\title&gt;'/>
+            |start body -> <key char='&lt;body&gt;'/>
+            |end body -> <key char='&lt;\\\\body&gt;'/>
+            
+            |start table -> <key char='&lt;table&gt;'/>
+            |end table -> <key char='&lt;\\\\table&gt;'/>
+            |start column -> <key char='&lt;td&gt;'/>
+            |end column -> <key char='&lt;\\\\td&gt;'/>
+            |start row -> <key char='\\t&lt;tr&gt;'/>
+            |end row -> <key char='&lt;\\\\tr&gt;'/>
+
+            |start ordered list -> <key char='&lt;ol&gt;'/>
+            |end ordered list -> <key char='&lt;\\\\ol&gt;'/>
+            |start unordered list -> <key char='&lt;ul&gt;'/>
+            |end unordered list -> <key char='&lt;\\\\ul&gt;'/>
+            |start list item -> <key char='&lt;li&gt;'/>
+            |end list item -> <key char='&lt;\\\\li&gt;'/>
+
+            |start paragraph -> <key char='&lt;p&gt;'/>
+            |end paragraph -> <key char='&lt;\\\\p&gt;'/>
+            |start bold -> <key char='&lt;b&gt;'/>
+            |end bold -> <key char='&lt;\\\\b&gt;'/>
+            |start underline -> <key char='&lt;u&gt;'/>
+            |end underline -> <key char='&lt;\\\\u&gt;'/>
+            |start link -> <key char='&lt;a href=""&gt;'/>
+            |end link -> <key char='&lt;\\\\a&gt;'/>
+            |create anchor -> <key char='&lt;a name=""&gt;lt;\\\\a&gt;'/>
+
+            |start division -> <key char='&lt;div&gt;'/>
+            |end division -> <key char='&lt;\\\\div&gt;'/>
+            |start span -> <key char='&lt;span&gt;'/>
+            |end span -> <key char='&lt;\\\\span&gt;'/>
+
+            |start form -> <key char='&lt;form&gt;'/>
+            |end form -> <key char='&lt;\\\\form&gt;'/>
+            |input check box -> <key char='&lt;input type="checkbox" name=""&gt;'/>
+            |input radio -> <key char='&lt;input type="radio" name=""&gt;'/>
+            |input hidden -> <key char='&lt;input type="hidden" name=""&gt;'/>
+            |input password -> <key char='&lt;input type="password" name=""&gt;'/>
+            |input submit -> <key char='&lt;input type="submit" value=""&gt;'/>
+            |input reset -> <key char='&lt;input type="reset"&gt;'/>
+            |input start text area -> <key char='&lt;textarea&gt;'/>
+            |input end text area -> <key char='&lt;\\\\textarea&gt;'/>
+
+            |attribute width -> <key char='width=""'/>
+            |attribute height -> <key char='height=""'/>
+            |attribute size -> <key char='size=""'/>
+            |attribute vertical align -> <key char='valign=""'/>
+            |attribute align -> <key char='align=""'/>
+            |attribute source -> <key char='src=""'/>
+            |attribute border-> <key char='border=""'/>
+            |attribute left margin -> <key char='topmargin=""'/>
+            |attribute top margin -> <key char='leftmargin=""'/>
+            |attribute alterate text -> <key char='alt=""'/>
+            |attribute action -> <key char='action=""'/>
+            |attribute method -> <key char='method=""'/>
+
+            |insert attributes -> <key char='&Left; '/>
+            
+            .
+    ]]> </vocab>
+</xvoice>

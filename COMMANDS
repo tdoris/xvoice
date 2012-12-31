@@ -1,0 +1,495 @@
+SPOKEN COMMANDS
+
+Some xvoice commands are hard-wired into the program and cannot be
+changed. They are:
+
+ * "Microphone off": turn off the microphone. You will need to turn it
+   back on using the "Push To Talk" button.
+
+ * "Command mode": load the grammar associated with the application
+   which is currently focused. For example, if you are dictating into
+   the vim application and you say "command mode", load the "vim"
+   grammar. See the section "xvoice.xml structure," below, for more
+   information about creating and editing grammars for applications.
+
+ * "Stop command": unload the grammar associated with the application
+   which is currently focused.
+
+ * "Dictate mode": enable general dictation. When this is enabled, in
+   addition to the commands in this list and any other loaded grammars
+   (such as one associated with the application which currently has
+   focus), you will be able to dictate normal English sentences.
+   (NOTE: although some speech products see "command mode" as the
+   opposite of "dictate mode", xvoice sees them as two separate
+   things. Turning on "command mode" does *not* turn off "dictate
+   mode", and vice versa.)
+
+ * "Stop dictation": disable general dictation.
+
+ * "Idle mode": the same as "stop dictation" and "stop command".
+
+ * "Correction": in dictate mode, erase the most recently-spoken
+   word. If you say "this is a test" and then "correction," xvoice
+   will send five delete characters, deleting " test".
+
+ * "Build grammar files": rebuild grammars. Useful if you have
+   modified your xvoice.xml file and want to load the changes. (See
+   below for more on the xvoice.xml file.)
+
+
+You can add new xvoice commands, most of which will be tied to an
+application. For example, you might want to specify that when you say
+"Save File" and vim has the current focus, xvoice should type
+":w<RETURN>". To modify these commands, you will need to modify the
+xvoice.xml file.
+
+
+THE XVOICE.XML FILE
+
+An xvoice.xml file came with your xvoice distribution with some
+default commands. You will probably want to customize it. xvoice will
+look in the following order for an xvoice.xml file, and use the first
+one it finds:
+
+ * $HOME/.xvoice/
+
+ * /usr/share/xvoice/ or /usr/local/share/xvoice/
+
+ * the current directory
+
+ * the directory above the current directory (..)
+
+XVOICE MODULEs
+
+After the xvoice.xml file is loaded, xvoice will load every file
+starting with "define-" and ending with ".xml" in
+DATADIR/xvoice/modules/ and then ~/.xvoice/modules.  Then it will load
+every module that doesn't start with "define-" from the same two paths
+(but it still must end with .xml).  Load order is alphabetically
+dependent.
+
+The reason for the define- prefix on some of the files is that it
+allows you to put your <define> statements early in the load list so
+they get saved into .bnf files before everything else that references
+them.
+
+Anyway, with all of this in place you should be able to just take a
+xml xvoice snippit, drop it in ~/.xvoice/modules and start xvoice and
+it'll find and load it.  In theory, you should be able to drop the
+files found at the vocabulary tracker into your modules directory as
+you see fit:
+  http://sourceforge.net/tracker/?atid=432376&group_id=3461&func=browse
+
+Note that load order dependency means that your personal files will
+trump the system files, except for possibly the window expression
+syntax (which is something I'll have to fix).
+
+These modules are defined using the same structure as the xvoice.xml
+file, discussed below.
+
+XVOICE.XML STRUCTURE
+
+The xvoice.xml file and/or module files contains entries with the
+following structure:
+
+<xvoice>
+  <application name='emacs' expr='emacs'>
+    
+    <<root>> = "expand" -> <key char='/' alt='true'/>
+        | "open file> -> <key char='xf' control='true'/>
+    ............
+  </application>
+  .....other apps defined here ....
+</xvoice>
+
+There are three kinds of top-level elements which can appear under <xvoice>:
+
+1. <application name='emacs' expr='emacs' dictation='off'
+   before="name" enableOn="my keywords">
+
+This element defines a grammar which will be loaded by xvoice
+automatically when a matching window receives focus -- and unloaded
+when that window loses focus. (To unload this grammar manually, say
+"command stop." To load it again, say "command mode.")
+
+  * "name" is the name of the grammar.
+
+  * "expr" is used by xvoice to match the name of the application
+    window. It is a regular expression. E.g., "VIM.*" will match vim
+    windows which dynamically set their title bar. "Netscape.*" will
+    match Netscape windows.
+
+  * (optional) "dictation" specifies if xvoice should enter dictation
+    mode automatically when a matching window first receives
+    focus. "dictation='on'" will turn dictation mode on automatically
+    for this application. The default is "off," so you do not have to
+    specify this attribute.
+
+  * (optional) "before" specifies that you want to load this
+    application and its expr(ession) sooner than the application in
+    the before tag.  Since the expressions are evaluated in the order
+    they are loaded, this provides you with a mechanism for forcing a
+    particular applications matching expression to be hit before
+    another.  This is useful when you might want a generic "emacs"
+    application set but then have a more specific "emacs.*html"
+    application and you don't want to worry about ordering in the
+    xvoice.xml file or the load ordering of the module files.
+
+  * (optional) "enableOn='GRAMMARNAME'" attribute specifies that you
+    want the magic phrases
+
+       enable GRAMMARNAME grammar
+       disable GRAMMARNAME grammar
+
+    to allow you to toggle on or off this particular grammar set in
+    the given window.  This allows you to selectively load multiple
+    grammar sets for a given window using voice commands.  It also
+    allows modules to be completely self contained and hook into the
+    run-time system without voice modifications.  Note that
+    GRAMMARNAME should be a dictionary based set of words so viavoice
+    can parse it.  This tag also works for the <vocab> set, documented
+    below.
+
+  * (optional) "alwaysOn='true|command'" specifies that you want the
+    grammar to always be loaded if possible.  If set to "true" it will
+    always be turned on.  If set to "command" it will always be turned
+    on in command mode, regardless of what application is currently on.
+
+
+If the window name changes *and* there's a grammar defined for the new
+name, xvoice will clear the enabled grammars, and load grammars for
+the new application. For example, if you define separate "xterm.*" and
+"VIM.*" <applications>, when vim changes the window title the vim
+grammar will be enabled and the xterm grammar disabled.
+
+There is one application called "general" defined in the default
+xvoice.xml file:
+
+  <application name='general' expr='general'>
+
+The commands defined in here are always available, no matter which
+application has focus.
+
+2. <vocab name='shell'>
+
+This element defines a grammar which is not automatically associated
+with any application, but can be loaded by xvoice with a <grammar>
+event. This is used to provide context grammars. For example if you
+want different commands for XTerm if you're using bash, ncftp, vim,
+etc., you can define them as <vocab>, and define commands like
+
+    | "shell commands on" -> <grammar name='shell' action='on' />
+
+to load your commands.
+
+The "enableOn" attribute, described above, also works in the <vocab>
+definition as well, and will help you automatically define mappings
+for turning on your vocabulary for a given set of words.  The
+"alwaysOn" attribute may also be used to always enable this
+vocabulary, as described above.
+
+3. <define>
+
+This element defines a grammar which can be included by a <grammar> or
+<vocab>.  This works like a macro, or #include in C. The grammar in a
+<define> is never compiled. It is merely written to a .bnf file. This
+allows common elements to be declared once and used by many
+applications, e.g. character commands ("a", "b", ...), or number
+translations ("two hundred five", etc.). A <define> section must not
+have a <<root>> element. A <application> or <vocab> includes the
+definition by using INCLUDE, e.g.
+
+    INCLUDE "numbers.bnf"
+
+The ".bnf" is required.
+
+For details on BNF format, consult the ViaVoice users guide.
+
+EVENTS
+
+Key events are declared as follows:
+
+<key char='a' />
+<key char='b' shift='true' alt='true' control='true'/>
+<key char='foobar' />
+<key char='ls\\n' />
+<key char='page down' />
+<key char='escape' />
+....
+
+Casing events are declared as follows:
+
+<setCase name='Uppercase' duration='continuous'/>
+<setCase name='Lowercase' />
+
+"name" can be "Uppercase", "Lowercase", "Capitalize", "TitleCase", or
+"Normal". Duration can be "continuous"; if it is not specified, the case
+returns to its previous setting after one word is recognized.
+
+....
+
+Spacing events are declared as follows:
+
+<setSpace name='no-space' duration='continuous'/>
+<setSpace name='normal' />
+
+"name" can be "no-space" or "normal."  Duration can
+be "continuous"; if it is not specified, the spacing returns to
+its previous setting after one word is recognized.
+
+....
+
+Pause events may be declared as follows:
+
+<pause/>
+<pause duration='2'/>
+
+Duration is measured in seconds. If not specified, it will be 1. If a
+duration which cannot be parsed into an integer is specified, duration
+will be 0.
+
+Pause events can be useful when you are writing macros which cause
+window focus to change. Window focus often changes too fast for X to
+keep up, and subsequent keystrokes will be lost. A pause event allows
+X to catch up and keystrokes will not be lost. Note that all spoken
+words during a pause will be queued and recognized (or not, as the
+case may be) after the pause ends.
+
+....
+
+Messages may be sent to the status bar of xvoice using:
+
+<setStatus value="Text">
+
+"Text" will then be shown in the status bar of the xvoice application.
+
+....
+
+You can start applications using the call command:
+
+ <call command='/usr/bin/mozilla' expr='Mozilla'/>
+
+This example, when invoked, would move the focus to a window named
+"Mozilla", if one existed; if none did, it would run the command
+"/usr/bin/mozilla" and move the focus to the resulting window.
+
+....
+
+Mouse events may be declared as follows:
+
+<mouse button='1' />
+<mouse button='1' action='double click'/>
+<mouse x='100' y='200' />
+<mouse x='100' y='200' origin='root' />
+<mouse button='1' x='100' y='200' origin='root' />
+....
+
+Mouse events have the following attributes
+
+ button:  which button to press
+ action:  one of 
+    up 
+    down
+    click       (default)
+    double click
+    triple click
+
+ x:  horizontal position
+ y:  vertical position
+ origin: one of
+    window      (relative to the current application window)(default)
+    root        (relative to the root window)
+    relative    (relative to the current cursor position)
+
+The motion command occurs before the button event,  which is usually what you
+want to move to an application button and click it.
+
+Events may be repeated by enclosing them in <repeat> tags:
+
+<repeat count=5>
+    <key char='\\b' />
+</repeat>
+
+LETTING XVOICE BUILD MOUSE EVENTS
+
+There is now a "Mouse events" dialog in the grammar menu. This is a
+helper function for generating mouse events, so you don't have to figure
+out the pixel coordinates by hand. 
+
+The dialog initially has two buttons, "Close", and "Capture", and a text
+box called "XML" which is initially empty.
+
+"Capture" will grab the mouse pointer and wait for you to click it somewhere on
+your application or desktop. Then it will display a record of the event under a
+tab named "1". This includes the location of the mouse click, and which button
+was pressed. At this point you can edit the event -- you can select a different
+button, or select a "double click" or "triple click" event instead. Or you may
+turn off the "motion" part of the event or the "action" part of the event, if
+you only want it to move the mouse, or click a button (usually it does both:
+first it moves the mouse, then it clicks a button).
+
+An XML copy of the event will be displayed in the XML box. You may at any time
+highlight the text and copy it to your xvoice.xml with the usual X cut and
+paste functions.
+
+If you hit "Capture" again, you may record a second event, which will be put on
+a tab named "2", and so forth. So you can capture a bunch of events, highlight
+them all, and copy them to your xvoice.xml.
+
+It is important that there be a current target application when you hit
+"Capture" if you want the coordinates to be correct for that application. So
+you would say "command mode" in the application window before hitting
+"Capture".
+
+NOTES ON ORIGIN:
+
+There are currently three "origins" allowed in <mouse> events: "root",
+"window", and "widget". 
+
+"root" is relative to the root window. You would use this, for example, to hit
+a button on a dock or some other permanent feature of your desktop.
+
+"window" is relative to the current application. This is usually what you want
+for hitting buttons in an application.
+
+"widget" is a fairly odd hack which tries to work around some problems with
+recorded mouse events. If you record an event relative to the application
+window, and then the application is resized, your coordinates are now wrong --
+most likely for buttons along the bottom or left side of the application.
+There's no good way around this. It's part of the nature of XVoice, as a
+non-integrated solution. A "real" solution would be to have the application
+fully integrated with the voice engine. I expect that will be done for all
+Linux applications in about 2010...
+
+Meanwhile, you can try the "widget" option. A "widget" mouse event looks like
+this:
+
+<mouse origin='widget' wid=':1:0:1:3:4' button='1' />
+
+The "wid" attribute ("widget id") is a map of the window hierarchy of the
+widget in question, as returned by XQueryTree. It has the property that it is
+not usually changed by resizing the application. So you can reliably hit a
+button even after resizing the app.
+
+Note: This is an ugly hack. This is clearly outside the realm of what X was
+designed to do. XQueryTree may return different results on different X servers.
+It may return different results if the application has large "optional" parts
+to its GUI. It may return different results just for the hell of it: nothing in
+the X spec says it has to be deterministic. However chances are it will be. I
+hope. ;) There's also no guarantee that the button you want to hit has its own
+X window. Different widget sets have different ideas about what needs its own
+window, and what doesn't. However many of them give X windows to buttons, so
+the "wid" will be valid.
+
+The "wid" attribute is recorded by the "Mouse events" dialog, so all you need
+to do is select the "widget" origin and paste the event into your xvoice.xml.
+
+This is very highly experimental code.
+
+MOVING THE MOUSE BY VOICE
+
+There are now two ways to move the mouse to arbitrary (not recorded) positions 
+on the screen. First, you can build a grammar using a number or a repeat tag,
+or both.
+
+For example
+
+    | move mouse {<number>} left -> <mouse origin='relative' x='-{1}' y='0' />
+    | move mouse {<number>} down -> <mouse origin='relative' x='0' y='{1}' />
+    ....
+
+for larger increments, use <repeat> on a fixed pixel count:
+
+    | move mouse {<number>} left -> <repeat count='{1}' />
+        <mouse origin='relative' x='-20' y='0' /> </repeat>
+
+
+
+Second, you can use the new mouse grid:
+
+THE MOUSE GRID
+
+The mouse grid is handled by the gui (MainWin object in the code). It installs
+a vocab called "guiVocab" which you will now see at start-up.
+
+The mouse grid begins when you say "mouse grid". It divides the screen into 
+9 squares:
+
++-------+-------+-------+
+|       |       |       |
+|   1   |   2   |   3   |
++-------+-------+-------+
+|       |       |       |
+|   4   |   5   |   6   |
++-------+-------+-------+
+|       |       |       |
+|   7   |   8   |   9   |
++-------+-------+-------+
+
+The numbers don't actually show up on the screen, but the grid
+does. Say the word "grid" followed by the number corresponding to the
+quadrant you want to move the mouse to, and a new grid will be drawn
+within that quadrant.
+
+This repeats until you're within about 4 pixels of whatever spot you were
+shooting for, which is close enough for about any button. At that point the
+mouse will jump to that position.
+
+You can exit this procedure without moving the mouse by saying "stop grid".
+You can exit and move the mouse to the center of the box by saying "warp".
+
+If you actually want to be able to press a button once you've moved the mouse,
+be sure you've defined button presses somewhere. The most obvious place is in
+the windowmanagershortcuts grammar. Here's what I'm using:
+
+            | click button -> <mouse button='1'/>
+            | double click button -> <mouse button='1' action='double click'/>
+            | triple click button -> <mouse button='1' action='triple click'/>
+
+You could expand this to allow buttons two and three as well.
+
+CHARACTER SETS AND KEYS
+
+The keyboard handling has been moved to the XTest functions, instead of
+XSendEvent. At the same time the character set and key code handling was
+reworked, in an effort to support more keys, and Western international
+character sets.
+
+Keys are now specified in the XML as follows.
+
+o The "char" attribute of key events is 8 bits. 
+
+o For characters 20-FF, the character is assumed to be part of the Latin-1
+character set, except in the following conditions.
+
+o '\\' begins a C style escape sequence for common non-printable characters,
+    '\\t' is tab, '\\r' is carriage return, '\\b' is backspace. '\\\\' is
+    backslash.
+
+o XML entities may be used to specify Latin characters, or non-printable
+    characters, as they are specified in X11R6/include/X11/keysymdef.h
+    Examples:
+        &F1;
+        &Page_Up;
+        &Escape;
+        &Caps_Lock;
+        &dead_acute;
+
+    These are defined in src/keys.h
+
+o Standard XML entities &amp; &lt; and &gt; are available.
+
+
+For X targets, after the above mappings, characters are looked up in the X key
+tables and the key code is faked with XTest. A shift is generated if needed.
+
+NOTE that this means you can't send any character which has no associated key.
+If your keyboard has no dead_acute, you can't send it with this mechanism.
+I need feedback from international users as to whether this is useful, since
+I have no idea how these characters are usually generated.
+
+Anything on your keyboard you should be able to generate with this mechanism.
+
+NOTE that moving to XTest makes the "manual focus" method obsolete. XVoice
+is always "autofocus" now, because XTest does not send key events to a
+specific client: it fakes key events as though they happened at the keyboard.

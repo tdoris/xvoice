@@ -1,0 +1,5 @@
+<xvoice>
+    <vocab name='gui'> <![CDATA[
+        <<root>> = dismiss .
+    ]]> </vocab>
+</xvoice>

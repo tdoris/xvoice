@@ -1,0 +1,77 @@
+<xvoice>
+
+    <!-- This defines key characters for use in the grammars that follow.
+     Modifiers may be given for any key in the order shift, control, meta.
+     To try a phonetic alphabet, rename phonetic-char to alphachar, and
+     alphachar to something else. -->
+
+    <!-- If you would like lowercase letters to be prefixed with "small" change
+         the line that reads
+            <modanychar> = {(capital|shift) -> shift='true'}?
+     to
+            <modanychar> = {(small -> shift='false')|((capital|shift) -> shift='true')}
+
+     Note that comments cannot appear in CDATA sections -->
+
+    <define name='keys'> <![CDATA[
+        <keychar> =
+             minus -> '-' |equals -> '='  |under score -> '_'
+            |plus -> '+'  |left brace -> '\{' |right brace -> '\}'
+            |left square bracket -> '[' |right square bracket -> ']'
+            |colon -> ':' |semi colon -> ';' |at symbol -> '@'
+            |tilde -> '~' |hash -> '#' |comma -> ','
+            |left angle bracket -> '&lt;' |right angle bracket -> '&gt;'
+            |bar -> '\|' |question mark -> '?' |front slash -> '/'
+            |back slash -> '\\\\' |bang -> '!' |double quote -> '"'
+            |quote -> "'" |per cent -> '%' |circumflex -> '^'
+            |ampersand -> '&amp;' |dot -> '\.' |dollar -> '\$'
+            |asterisk -> '*' |space -> ' ' |left bracket -> '\('
+            |right bracket -> '\)' |return -> '\\r' |back space -> '\\b'
+            |escape -> '&Escape;' |tab -> '\\t' |left -> '&Left;'
+            |page down -> '&Page_Down;' |page up -> '&Page_Up;'
+            |right -> '&Right;' |up -> '&Up;' |down -> '&Down;' .
+
+        <alphabet> = 
+            a    |b
+            |c   |d   |e  |f
+            |g   |h   |i  |j
+            |k   |l   |m  |n
+            |o   |p   |q  |r
+            |s   |t   |u  |v
+            |w   |x   |y  |z .
+
+        <alphachar> =
+            a -> 'a'    |b -> 'b'
+            |c -> 'c'   |d -> 'd'   |e -> 'e'  |f -> 'f'
+            |g -> 'g'   |h -> 'h'   |i -> 'i'  |j -> 'j'
+            |k -> 'k'   |l -> 'l'   |m -> 'm'  |n -> 'n'
+            |o -> 'o'   |p -> 'p'   |q -> 'q'  |r -> 'r'
+            |s -> 's'   |t -> 't'   |u -> 'u'  |v -> 'v'
+            |w -> 'w'   |x -> 'x'   |y -> 'y'  |z -> 'z' .
+
+        <phonetic-char> =
+            alpha -> 'a'      |bravo -> 'b'
+            |charlie -> 'c'   |delta -> 'd' |echo -> 'e'  |foxtrot -> 'f'
+            |golf -> 'g'      |hotel -> 'h' |india -> 'i' |juliet -> 'j'
+            |kilo -> 'k'      |lima -> 'l'  |mike -> 'm'  |november -> 'n'
+            |oscar -> 'o'     |paris -> 'p' |quebec -> 'q' |romeo -> 'r'
+            |sierra -> 's'    |tango -> 't' |uniform -> 'u' |victor -> 'v'
+            |whisky -> 'w'    |x -> 'x'     |yankee -> 'y' |zulu -> 'z' .
+
+        <modalphachar> = {(capital|shift) -> shift='true'}?
+            {control -> control='true'}?
+            {meta -> alt='true'}?
+            {<alphachar>} -> <key char={4} {3} {2} {1} /> .
+
+        <modanychar> = {(capital|shift) -> shift='true'}?
+            {control -> control='true'}?
+            {meta -> alt='true'}?
+            {(<alphachar>|<keychar>)} -> <key char={4} {3} {2} {1} /> .
+
+        <multichar> =
+            {<modanychar>} {<modanychar>} -> {1} {2}
+           |{<modanychar>} {<modanychar>} {<modanychar>} -> {1} {2} {3} 
+           |{<modanychar>} {<modanychar>} {<modanychar>} {<modanychar>} -> {1} {2} {3} {4} .
+
+    ]]> </define>
+</xvoice>

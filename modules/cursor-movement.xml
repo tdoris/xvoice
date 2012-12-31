@@ -1,0 +1,30 @@
+<xvoice>
+    <vocab name='Cursor Movement' enableOn='cursor movement' 
+     alwaysOn='application'> <![CDATA[
+    INCLUDE "numbers.bnf"
+            <<root>> =
+                 backspace {<raw-number>} ->  
+                         <repeat count='{1}'> <key char='\\b'/>   </repeat>
+                |left arrow {<raw-number>} ->  
+                         <repeat count='{1}'> <key char='&Left;'/>  </repeat> 
+                |right arrow {<raw-number>} ->    
+                         <repeat count='{1}'> <key char='&Right;'/>  </repeat>
+                |up arrow {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Up;'/>  </repeat>
+                |down arrow {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Down;'/>  </repeat>
+                |left {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Left;'/>  </repeat>
+                |right {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Right;'/>  </repeat>
+                |up {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Up;'/>  </repeat>
+                |down {<raw-number>} ->   
+                         <repeat count='{1}'> <key char='&Down;'/>  </repeat>
+                |page up {<raw-number>} ->  
+                         <repeat count='{1}'>  <key char='&Page_Up;'/>  </repeat>
+                |page down {<raw-number>} ->  
+                         <repeat count='{1}'>  <key char='&Page_Down;'/>  </repeat>
+.
+]]> </vocab>
+</xvoice>

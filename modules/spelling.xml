@@ -1,0 +1,5 @@
+    <vocab name='spelling' enableOn='spelling' alwaysOn='application'> <![CDATA[
+INCLUDE "keys.bnf"
+        <<root>> = spell {<multichar>} -> {1}
+         .
+    ]]> </vocab>

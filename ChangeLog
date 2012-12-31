@@ -1,0 +1,491 @@
+Thu May 15 10:28:57 EDT 2003
+   o Carlo Wood's patch to remove all compiler warnings when
+     compiling with -W -Wall -Wwrite-string.  Removes mostly
+     unused variables and adds const correct handling for
+     string literals.  Now using standard C++ header files.
+     Added "sys.h", a global header meant for OS specific
+     porting issues and globally needed macros.
+
+Thu May  8 13:14:14 EDT 2003
+   o Carlo Wood's patch to remove all compilation warnings with g++-3.2
+     and 2.96.
+
+Fri May  2 14:06:28 EDT 2003
+   o Kevin Moore's patch to reap dead children and prevent the
+     generation of zombie processes.
+
+Fri May  2 13:40:27 EDT 2003
+   o Brian Vancil's fix to allow xvoice to recognize window names under
+     Gnome 2.
+
+Sun Nov 10 16:31:21 EST 2002
+    o Bug fix: under some window managers we were failing to set the initial
+      window right, and segfaulting.
+
+Sat Sep  7 21:17:51 EDT 2002
+    o Added doc for <call ... />; added example to xvoice.xml.
+
+Sat Sep  7 17:28:18 EDT 2002
+    o Added SlowKeys option
+
+Mon Aug 19 17:06:32 EDT 2002
+    o Fixed bug in xvoice.xml file.
+
+Fri Aug 16 14:19:03 EDT 2002
+    o Fixed bug in numbers support, thanks to Rob Spearman.
+
+Thu Aug  1 18:33:19 EDT 2002
+    o Added better numbers support, thanks to Rob Spearman, and otherwise
+      cleaned up xvoice.xml.
+
+Mon Jul  8 20:28:44 EDT 2002
+    o Remove all files in the grammar directory before building new
+      grammar files.
+
+Mon Jul  1 13:57:55 EDT 2002
+    o Added "dictation" attribute to <application> element, to specify
+      that dictation should automatically be turned on for a particular
+      application.
+
+Fri Jun 28 14:08:31 EDT 2002
+    o Load "general" grammar if it exists.
+
+Sat Jun 15 16:01:58 EDT 2002
+    o Kevin Van Horn's patch to make xvoice compile with gcc 3.
+
+Mon Jun 10 12:27:15 EDT 2002
+    o Added pause command and event.
+
+Sat Jun  8 20:07:37 EDT 2002
+    o Modifier keys are no longer pressed and released for each
+      character in a <key> command, but are pressed and released once
+      for all the keys in that command. Added modifier event and changed
+      key event (it no longer has modifiers).
+
+Mon Feb  4 11:15:14 EST 2002
+    o Ripped out LinkedList and used stl lists instead. As a result, got
+      rid of WordInfoQueueHead; its functionality is now part of
+      WordInfoQueue.
+
+Fri Dec 21 23:45:46 EST 2001
+    o Removed depencency on Gnome window manager spec. We now add a Window
+      to our list of currently active windows the first time it is
+      focused, and periodically garbage collect closed windows. Note that
+      the old code has been marked for future deletion, but not deleted.
+
+Sun Nov 25 19:43:15 EST 2001
+    o Added callback when vocabularies are undefined.  It doesn't do much
+      (just checks for errors and potentially prints debugging
+      information) but it silences a repeating SMAPI error which
+      was prompted everytime a vocabulary was undefined.
+
+Sun Nov 25 15:55:19 EST 2001
+    o Better error message handling and informational output.
+    o Some errors which were marked FATAL in the code did not actually make
+      the program exit; now they do.
+    o Added Deborah and Jessica to authors list in About box & updated
+      copyright dates.
+    o Fixed bugs in help menu.
+
+Sat Nov 24 16:20:43 EST 2001
+    o configure now also checks for "sh"
+    o added Jessica/Deborah to some copyright notices, and to the authors list
+    o we no longer include or link to Xmu; it wasn't used
+
+Wed Nov 21 11:10:27 EST 2001
+    o Fixed some punctuation bugs (based on patch by Geoff Clare)
+
+Wed Nov 21 09:35:44 EST 2001
+    o Changes to make the finicky gcc2.95 happy with the most recent check-in.
+
+Sun Nov 18 13:08:10 EST 2001
+    o added initial infrastructure for correction (API and some
+      implementation); note that correction does not currently work. See
+      the CODEGUIDE for a discussion of this API.
+    o Maintain a history of words which have been recognized; garbage
+      collect this history.
+    o Added some comments to some code.
+
+Mon Jul 23 09:10:34 EDT 2001
+    o configure checks more intelligently for shell and ViaVoice
+    o configure passes shell information to xvoice.cc
+    o user may specify unusual ViaVoice installation locations with
+      VIAVOICE_INCLUDE and VIAVOICE_LIB environment variables (see
+      INSTALL)
+
+Fri Jun 22 21:39:51 EDT 2001
+    o Added preferences dialog to set dictation (spacing and casing)
+     preferences; moved engine prefs dialog inside Gnome property box
+
+Sat Jan  6 19:42:00 EST 2001
+    o Modified wmgeneral.cc and gnomeMainWin.cc to make xvoice compile
+      against gcc2.95.2.
+    o Ran autoconf to generate new configure and Makefile feeder files,
+      as necessitated by recent previous checkins.
+
+Wed Jan  3 20:28:25 EST 2001
+    o Set AM_INIT_AUTOMAKE  to "0.9.5dev". When a new tarball
+      is released, this should be changed to "0.9.5."
+
+Sat Dec 16 15:15:47 EST 2000
+    o Fixed "correction" command
+    o Removed extraneous #define DEBUGs
+    o Reformatted some code
+
+Wed Nov 15 21:18:14 EST 2000
+    o Added spacing and casing commands
+    o rewrote logic in dictationHandler (App.cc)
+    o Modified State class
+
+Thu May 18 11:13:12 PDT 2000
+    o Removed _valid target checking & the navTarget kludge, because
+        we don't need it with XTest.
+    o Fixed command line option parsing when environment isn't set.
+
+Mon Apr 24 23:38:20 PDT 2000
+    o Updated many copyright notices & added rcs version id's.
+    o Rewrote mouse grid with Xlib calls.
+    o Added WindowMaker dock applet, wmMainWin.
+    o Cleaned up start-up code & removed gtk/X dependencies in xvoice.cc
+    o Cleaned up option parsing & moved it all to libpopt.
+    o Cut obsolete namedEventStream
+    o Made getNavTarget() return _target. Need to eliminate
+        getNavTarget entirely.
+    o Eliminated bogus 2nd connection to X server & gDisplay global
+        (gtk opens the connection for us).
+    o Added "warp" command for mouse grid & changed "escape" to
+        "stop grid".
+
+Sat Apr 15 21:58:50 PDT 2000
+    o Fixed mouse grid problems with newer versions of gtk.
+    o Enabled modifiers on mouse events.
+    o Moved all keyboard handling to XTest, instead of XSendEvent. Removed
+        "manual focus" mode, since it makes no sense with Xtest.
+    o Added handling of all Latin-1 characters, and a long list of other keys,
+        including miscellaneous stuff like F1-F12, and the various Latin
+        character sets. Removed old style key strings like "page down".
+
+Sun Apr  2 13:45:20 PDT 2000
+    o fixed command/dictate mode activation in Focus(), which was not being done
+      atomically between target changes (vCommand() can change the target) & so
+      could activate the wrong state.
+    o fixed checking of (getTarget() == NULL) to (getTarget()->valid()) in App.c,
+      which was causing a segfault.
+Sun Apr  2 12:06:58 PDT 2000
+    o added autofocus_cb timeout function in gnomeMainWin() to periodically check
+      the focus window & invoke CFOCUS.
+    o added CFOCUS event in App.c which will restore state when refocusing a
+      target.
+    o added target state save function in App.c so we can remember which grammars
+      are loaded for a particular target.
+    o added active target list _actvWin to Target class; added root window property
+      event callback so we can track targets under the gnome wm standard.
+    o cleaned up warnings with -Wall.
+
+Thu Mar 23 19:45:15 PST 2000
+    o disabled the GNOMEUI "About" menu item because it keeps creating
+      an accelerator key of Alt_L. WTF???
+    o added mouse grid function to gnomeMainWin
+    o fixed problem of vocab callbacks not being notified after a successful
+      install.
+    o clean up desensitization conditions of some buttons in the mouse event 
+      builder dialog
+
+Wed Mar 22 21:47:34 PST 2000
+    o fixed bug of msgVocab not being unloaded if dialogs are closed by mouse
+    o <mouse> event builder dialog to capture mouse events to XML
+    o added support for origin='widget' in <mouse> events.
+
+Sat Mar 18 21:02:48 PST 2000
+    o fixed perpetual resizing of the application whenever something is
+        added to the vocab Clist in gnomeMainWin.
+    o redesigned EVMOUSE around the Xtest extension, since XSendEvent doesn't
+        produce good results. Mouse events now work (w/o modifier keys at the
+        moment).
+    o added a <repeat> event type.
+    o added voice engine settings hooks & gui settings dialog.
+    o moved all application handling to App.c & App.h. Voice.cc is only voice
+        engine stuff now.
+    o made MainWin pure virtual
+    o fixed segfault when no expr attribute in <application>
+    o move xvoice.spec to xvoice.spec.in so we can automake the version
+    o fixed printf of old version number on start-up.
+
+Mar 9, 2000, v0.8:
+
+    o Added rudimentary gnome config checking in configure.in
+
+	o Switched to using a config.h & autoheader to create the name & verison
+  macros, instead of using version.h
+
+	o Added all the .h files to the Makefile.am's, so the "make dist" target
+  will actually work.
+
+	o Added an active vocabulary clist to the gui, so one can easily see
+  which vocabs are available.
+
+	o Added voice control for warning dialogs.
+
+	o changed installVocab() to duplicate the new style of enableCommandGrammar().
+  It records a callback, which is invoked when a word is recognized. On making
+  this change I noted with horror that SMAPI doesn't report the vocabulary name
+  when a word is recognized from a command grammar. This is pretty brain-dead.
+  Currently RecoWordCB searches all installed vocabs to find where the word came
+  from. This should be fine for small vocabs.
+  
+	o made enableCommandGrammar() generic, so windowmanagerhints, or the
+  gui can use it, too. it now takes a dispatch callback which is used
+  to deliver recorded phrases & translations. Also, it doesn't maintain
+  the application grammar list. RecoPhraseCB invokes the callback, rather
+  than sending things directly to a target.
+
+	o disableCommandGrammar() doesn't maintain the application grammar list,
+  as above.
+
+	o added a callback pointer to class "grammar".
+
+	o changed all messages in ParseEventStream to use LogMessage()
+
+	o added severity level to LogMessage() (currently unused)
+
+	o switched the main window widget and menus to the libgnomeui functions. 
+  this was easier than trying to add menus & dialogs in raw gtk.
+
+	o added Rebuild menu item which recompiles the grammars w/o needing to 
+  restarting XVoice. Note that it does not reload grammars. Saying
+  "command mode" again will reload them.
+
+	o rewrote several error messages, and eliminated some uses of CheckSmRc
+  in order to add some better error checking (e.g. report file errors as
+  file errors).
+
+	o changed handling of mic state to use the MicStateCB.
+
+	o made MainWin a virtual class. moved gnome stuff to gnomeMainWindow.cc.
+
+	o added pop-up dialogs in the gnomeMainWin::errormsg() callback.
+
+	o Add run-time switch to turn on SAVE_AUDIO, so we don't by default fill up the
+  file system.
+
+	o Deferred initialization of ViaVoice & installation of grammars until after the
+  gui is up.
+
+	o Rewrote the dictate/command state machine so that both may be enabled at once.
+
+
+Feb 29, 2000 
+
+New features:
+	o context grammars. Two new XML tags support this. In a <xvoice> block, you
+  can declare a <vocab>, which is like a <application> tag, except there's
+  no "expr" attribute, and the vocabulary is not automatically associated with any
+  application. The vocabulary is compiled at run-time, and you can turn it on
+  or off in an event stream with a <grammar> event. Check README.config for
+  details.
+
+Detailed changes:
+
+	o EventStreams have been generalized, so they can be more than key or mouse events.
+  They are no longer XEvent structs. A Target is responsible for mapping the
+  generic event to whatever its native event struct is (XEvent, etc.). Voice.cc
+  will pull off events specific to it (<grammar>), and pass the rest to the
+  target. It's kinda ad-hoc right now. The dispatcher may be reworked later.
+
+  It's unclear that an "event stream" is really needed. Why not have the parser
+  call Target or Voice directly as it parses the XML? I decided against this,
+  because Target events may need to be synced to catch errors, e.g. XSync(),
+  and it would be annoying to generate an XSync() call after every key event.
+  So we build a stream.
+
+	o Moved the notify callback into MainWin, since the main event loop is a ui
+  thing, not a voice engine thing. This way we can link as a KDE, WINGS, or a
+  console mode app & not worry about gtk dependence.
+
+	o Did some general cleaning of Voice.cc:
+        Made lots of stuff static
+        Organized all the variable declarations at the top
+        Homogenized the error reporting
+        Eliminated usage of sprintf & unchecked fixed-length buffers
+        Clean up some apparent misuse of CheckSmRC        
+
+	o Added a error message callback stub for MainWin, so it will be able to report
+  error messages. This won't be enabled until the pop-ups can be dismissed by voice.
+        
+Feb 24, 2000
+
+New features:
+	o BNF  grammars. You may now say things like "delete four lines", "highlight
+  the second parameter", "go to line 257", "control shift m", "control meta a",
+  etc., without having to declare 257 commands "go to line 1", "go to line 2", 
+  etc., or every permutation of control, shift, and meta.
+
+  This is a pretty large change in paradigm. The format of the config file
+  has changed. See the separate README.config for details. cvtxml.pl will
+  attempt to convert your old config files.
+
+	o Grammars are compiled at run-time. No need to run "xml2bnf".
+
+	o Allow mutiple char's is a char='' attribute.
+
+Detailed changes:
+	o Allow multiple keys in a char='' attribute, if they all have the same
+  modifiers.
+
+	o EventStreams are now dynamically generated(!!!), so we can fill in
+  templates, etc. This means there is no "application event stream" stored
+  for each application. event xml is generated by the translations engine,
+  and parsed on-the-fly from RecoPhraseCB. The "applicationEventStreamList"
+  is now a "applicationList". event xml in the config file is not parsed
+  at start-up, but is written to a bnf file & compiled for use later.
+
+	o Removed "asisapplications", since all apps are effectively "as is" when 
+  using the translation engine (if you give no translation, the text is
+  the translation).
+
+	o Grammar and translations are compiled at run-time from the config file.
+  Right now it's done by invoking the shell. This should probably be 
+  changed to use the API calls.
+
+	o Added a "<define>" tag for grammars which are not for a specific app, but
+  may be included inside <application> grammars.
+
+	o Updated expat to the latest version, because it has Cdata call-backs.
+
+	o Rewrote the config file parsing to use a context structure, instead of
+  a bunch of globals.
+
+	o Fixed declaration of set_trap so ansi compilers won't barf on it.
+
+	o Changed the current command grammar name in Voice.cc to be a map<>. This
+  is because 1) we now need to associate translations with each grammar, and
+  2) I hope to add context grammars which can be enabled by voice commands,
+  ("enable shell commands", "enable ftp commands", etc.) so we will 
+  potentially have many grammars installed & need a way to index them.
+
+	o cleaned up enableCommandGrammar() to be more generic, so we don't have
+  duplicate code for enabling windowmanagershortcuts.
+
+	o removed the get*EventStream calls, as they are obsolete with dynamic 
+  event streams.
+
+	o rewrote RecoPhraseCB to be a little easier to follow & to avoid duplicate
+  code.
+
+Feb 16, 2000
+
+New features:
+	o Switching apps no longer requires moving back to XVoice. Just say "dictate
+  mode", "command mode", "idle mode", "microphone off", to switch to that mode
+  in the currently focused window. Use the windowmanagershortcuts vocab to focus a
+  different window.
+
+	o A text widget has been added to display recognized and rejected words, so
+  you don't have to watch stdout to see what's going on.
+
+	o Bug fixes (below)
+
+
+Detailed changes:
+	o rewrote the Voice state machine to have less logic in the UI module (MainWin).
+
+	o Using a centralized event dispatcher in Voice, so we can take events from
+  many sources (e.g. app command grammers... to be added)
+
+	o fixed a race condition when defining vocabularies which caused vocabs to
+  sometimes not be enabled on start-up.
+
+	o fixed crash on BadWindow errors when working with windows not our own
+  (sending, or finding the focus window)
+
+	o move iteration over event streams into Target.cc, from EventStream.cc, to
+  better isolate BadWindow error trapping.
+
+	o fixed bug which caused windowmanagershortcuts key sequences to be delivered
+  to the current selected application.  This was due to the use of XSendEvent.
+  Normal keystrokes are captured by the manager before reaching a client. The
+  windowmanagershortcuts mechanism is pretty loose and depends upon which
+  manager you use. Probably this should be dumped in favor of the gnome
+  mechanism. The current work-around sends these events to the XVoice window,
+  which should ignore them.
+
+	o the TargetList is disabled until the wm issues above are fixed.
+
+	o took preliminary steps to isolating X and gtk code so we can eventually be a
+  console app, wm dock app, gnome panel app, kde dock app, etc.
+
+
+Feb 16, 2000
+
+	o Makes XVoice attempt to bootstrap the environment if it's not set correctly,
+so you don't have to run vvsetenv (or worse, run bash and then vvsetenv if
+you're using a csh derivative). It uses bash2 to do the bootstrapping. This is
+because bash has a bug which is invoked by vvsetenv.  You can also use zsh, or
+any other shell that understands bash style variable settings. Just don't use
+bash.
+
+
+Feb  7, 2000
+	o  Adds a new attribute, "expr", to the application XML tag which is
+a regular expression used to match the target application. This allow much
+greater flexibility. E.g.:
+
+to match a vim window:
+
+  <application name='vim' expr='VIM.*'>
+
+to match vim or an xterm:
+
+  <application name='vim' expr='(VIM.*)|(Xterm)'>
+
+to match netscape:
+
+  <application name='netscape' expr='Netscape.*'>
+
+This attribute MUST be present in all application tags.
+
+
+
+v0.7
+
+	o Added facilities to generate page up/down events, cursor key events and escape key event.
+	o Added a windowmanagershortcuts vocab to the xml file. This vocab is always enabled - so the user can switch focus between windows and switch between virtual desktops by saying "switch focus" and "move to desktop area left/right/above/below" and "iconify window". 
+ 	o Added a Makefile to the .xvoice directory to automate the generation and compilation of grammars based on the xvoice.xml file.
+		
+	o Added SmUndefineVocab call to instances where SmDisableVocab used to be. This seems to have corrected the situation whereby a vocabulary was still active after it had been "SmDisable"(d). Still not sure if this is correct, awaiting response from IBM
+	o Added facility for saying "select nth appname" as in "select fifth terminal" which selects the fifth listed terminal in the xvoice application list as the target for subsequent commands. Also, the first (or only) application, for example "emacs" can be selected by saying "select emacs".
+ 
+
+Nov 25, 1999 v0.6
+	o Added facility for passing recognised phrases directly to an application for which a .fsg grammar file had been supplied. This is necessary and useful for applications with potentially long and varied spoken command sequences as the xml style of grammar definition provides no facility for accomodating nonterminals.
+	o Bugfix; the system now correctly looks for the xvoice.xml file in ~/.xvoice
+	
+Oct 14, 1999 v0.5
+	o Added support for XML command grammars
+	o Added the xml2bnf program
+	o Added the xvoice.sh script for csh users
+	o Decided to add a pre-built executable to the distribution
+	o Modified the configure script to permit builds on certain 
+	  systems.
+May ??, 1999 v0.4
+Fourth Release
+	o Added warning when VV server is not running (SmConnect == -4)
+	o Added more commands to dictation mode
+	o Fixed bug in command mode vocab specifcation
+	o Added better punctuation and paragraph support
+	o Added very rudimentary correction stack
+
+May 23, 1999 v0.3
+Third Release
+	o Changed expat libray to be named libexpat to avoid conflict with 
+	  libxml component of GNOME. Should probably look into using this
+	  instead.
+	
+May 21, 1999 v0.2
+Second release
+	o Added more complete GTK based GUI
+	o Added command vocab for XVoice itself
+	o Added beginnings of XML based command event streams (still inoperavite)
+
+May 5, 1999 v0.1
+First release

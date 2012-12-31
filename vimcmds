@@ -1,0 +1,147 @@
+
+function! Savesel(sel)
+    let g:lastsel = a:sel
+    exec "normal " . a:sel
+endfunction
+
+function! Lastsel()
+    exec "normal " . g:lastsel
+endfunction
+
+function! Recentword()
+    let line=getline('.')
+    let c = col('.') - 1
+    let m = ""
+    while (1)
+        let st = match(line, '\i\+')
+        if (st < 0 || st > c) " the last one was it
+            break
+        endif
+        let end = matchend(line, '\i\+')
+        let m = matchstr(line, '\i\+')
+        if (st < c && c < end) " this is it
+            break
+        endif
+        let line = strpart(line, end, strlen(line) - end)
+        let c = c - end
+    endwhile
+    return m
+endfunction
+
+" we make strong assumptions about formatting to
+" make this easy
+function! Funcdef()
+        let i = line('.')
+    while (1)
+        let line = getline(i)
+        if (match(line, '^{') != -1)
+            return i
+        endif
+        let i = i - 1
+        if (i < 0)
+            return -1
+        endif
+    endwhile
+endfunction
+
+function! Findtype(word) " need to check for comments
+    let word = a:word
+    let top = Funcdef()
+    let this = line('.')
+    if word == "" || top < 0
+        return -1
+    endif
+    let top = top + 1
+    let type = ""
+    while (1)
+        let line = getline(top)
+        if (match(line, '\<' . word . '\>') != -1)
+            let type = matchstr(line, '\i\+')
+            break
+        endif
+        let top = top + 1
+        if top >= this
+            break
+        endif
+    endwhile
+    return type
+endfunction
+
+com! Getstruct call Getstruct()
+function! Getstruct()
+    let local = Recentword()
+    if local == ""
+        perl system("cat /dev/null > .dynatag")
+    endif
+    let struct = Findtype(local)
+    if struct == ""
+        perl system("cat /dev/null > .dynatag")
+    endif
+    exec "perl system(\"dynatags " . local . " " . struct . " \") "
+endfunction
+            
+function! Yankobj(type, n)
+    if a:type == 'l' 
+        exec "normal " . a:n . "yy"
+    else
+        exec "normal y" . a:n . a:type
+    endif
+endfunction
+
+com! Listfunc call Listfunc()
+function! Listfunc()
+    exec "grep '^\\w\\+[^(]\\+(' ". bufname("%")
+endfunction
+
+function! Grabobj(type, n)
+    if a:type == 'l' 
+        if a:n == 1
+            exec "normal V"
+        else
+            exec "normal V" . (a:n-1) . "j"
+        endif
+    else
+        exec "normal v" . a:n . a:type
+    endif
+endfunction
+
+com! Nextswitch call Grabblock("/\\sswitch\\s*(")
+com! Nextfor call Grabblock("/\\sfor\\s*(")
+com! Nextif call Grabblock("/\\sif\\s*(")
+com! Nextwhile call Grabblock("/\\swhile\\s*(")
+
+com! Prevswitch call Grabblock("?\\sswitch\\s*(")
+com! Prevfor call Grabblock("?\\sfor\\s*(")
+com! Previf call Grabblock("?\\sif\\s*(")
+com! Prevwhile call Grabblock("?\\swhile\\s*(")
+
+function! Grabblock(str)
+    exe "normal " . a:str . "\r"
+    exe "normal v/{" . "\r"
+    exe "normal %o"
+endfunction
+
+com! Thisblock call Grabthisblock()
+
+function! Grabthisblock()
+    exe "normal vaB"
+                        " check for trailing while
+    let i = line(".")
+    let this = getline(i)
+    let next = getline(i + 1)
+    if this =~ "while" || next =~ "while"
+        exec "normal /(\r%"
+    endif
+                        " check for leading while, etc.
+    exec "normal o"
+    let i = line(".")
+    let this = getline(i)
+    let prev = getline(i - 1)
+    let ptn = '\s\(\(\(\(while\)\|\(if\)\|\(for\)\|\(switch\)\)\s*(\)\|\(do\)\)'
+    if this =~ ptn || prev =~ ptn
+        exec "normal ?" . ptn . "\r"
+    endif
+endfunction
+
+command! Findfunc /^\w\+[^(]\+(
+command! Prevfunc ?^\w\+[^(]\+(

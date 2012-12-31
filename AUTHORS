@@ -1,0 +1,22 @@
+XVoice is now maintained on sourceforge. See xvoice.sourceforge.net for links
+to the project page, which has info about development and the developers.
+
+v0.9 by Brian Craft, Deborah Kaplan, Jessica Hekman, Wes Hardaker.
+
+v0.8 changes by Brian Craft (bcboy@thecraftstudio.com)
+
+XVoice is now maintained by Tom Doris (tdoris@compapp.dcu.ie)
+v0.7 bugfix contribution by Nolan Darilek (char* casting for strtok calls) 
+Acknowledgements must be made to all those patient users who have contributed ideas, suggestions and bug reports, thanks.
+
+Previously (up to V0.4):
+XVoice is written and maintained by David Z. Creemer (david@zachary.com)
+
+Much of the code is comes from other sources:
+
+All of the following are GPL'ed:
+
+Some sample GTK-- code was taken from Terraform
+	<http://www.peoplesoft.com/peoplepages/g/robert_gasch/terraform/>
+GTK+, and GTK--
+	<http://www.gtk.org>

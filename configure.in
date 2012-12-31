@@ -1,0 +1,322 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl XV=xvoice
+
+dnl XVoice definitions
+PACKAGE=xvoice
+
+dnl Gtk+ and Gtk-- version dependencies
+gtk_min_maj_rev=1
+gtk_min_min_rev=2
+gtk_min_mic_rev=0
+
+AC_INIT(src/Target.h)
+AM_INIT_AUTOMAKE(xvoice, "0.9.6")
+AM_CONFIG_HEADER(config.h)
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_CXX
+AC_LANG_CPLUSPLUS
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_ARG_PROGRAM
+
+dnl ViaVoice requires dynamic audio libs
+AC_DISABLE_STATIC
+
+AM_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
+
+AC_PATH_X
+AC_HEADER_STDC
+
+dnl
+dnl Decide if we're on a "modern" system and Carlo Wood's vvinstall
+dnl script was used to install ViaVoice.
+dnl
+AC_ARG_WITH(vvinstall,
+[  --with-vvinstall=DIR      Location of Carlo Wood's vvinstall directory for 
+                              newer operating systems with newer glibcs.
+                              [default = check in /usr/local/viavoice]],
+            vv_install_dir="$withval",
+	    vv_install_dir="/usr/local/viavoice/redhat-6.2")
+
+AC_MSG_CHECKING(If this system's ViaVoice was installed with Carlo Wood's vvinstall)
+if test -d $vv_install_dir ; then
+    AC_DEFINE_UNQUOTED(VVINSTALLED_SYSTEM, "$vv_install_dir")
+    AM_CONDITIONAL(VVINSTALLED_SYSTEM, test yes = yes)
+    AC_MSG_RESULT(yes)
+else
+    AM_CONDITIONAL(VVINSTALLED_SYSTEM, test yes = no)
+    AC_MSG_RESULT(no)
+fi
+
+dnl
+dnl Look for smapi; should be in /usr/lib, so no need to add
+dnl an extra -L.
+dnl
+
+AC_ARG_WITH(vv-libs,[  --with-vv-libs=DIR      Location of ViaVoice libraries (optional)],
+            vv_config_libs="$withval", vv_config_libs="")
+
+if test x$vv_config_libs != x ; then
+    XV_VV_LIBS="-L$vv_config_libs"
+fi
+
+save_LIBS="$LIBS"
+LIBS="$LIBS $XV_VV_LIBS"
+AC_CHECK_LIB(smapi, SmOpen, have_smapi=yes, have_smapi=no)
+LIBS="$save_LIBS"
+
+if test x$have_smapi = xno; then
+	AC_MSG_ERROR([ViaVoice SMAPI runtime kit NOT found. 
+
+Make sure ViaVoice runtime is installed, or try setting --with-vv-libs=DIR.])
+fi
+
+AC_ARG_WITH(vv,[  --with-vv=DIR           Location of ViaVoice directory (optional)],
+            vv_config="$withval", vv_config="")
+
+if test x$vv_config != x ; then
+    XV_VV=$vv_config
+else
+    XV_VV="/usr/lib/ViaVoice"
+fi
+
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I$XV_VV/include"
+AC_CHECK_HEADER(smapi.h, have_smapi_h=yes, have_smapi_h=no)
+CPPFLAGS="$save_CPPFLAGS"
+
+if test x$have_smapi_h = xno; then
+	AC_MSG_ERROR([ViaVoice SMAPI SDK NOT found.
+
+Make sure ViaVoice SDK is installed, or try setting --with-vv=DIR.])
+fi
+
+dnl XXX: we should test to see if a simple vv compiled program works.
+
+dnl
+dnl This AC_DEFINE and AM_CONDITIONAL are only useful
+dnl if we support multiple voice engines. Currently we don't
+dnl and so bail out above when we don't find smapi.
+dnl
+
+AC_DEFINE(HAVE_SMAPI)
+AM_CONDITIONAL(HAVE_SMAPI, test x$have_smapi = xyes)
+
+AC_MSG_CHECKING(if smapi using void * or caddr_t)
+CXXFLAGS="-I$XV_VV/include -Werror"
+AC_TRY_COMPILE(
+[
+#include "smapi.h"
+],[
+SmHandler ConnectCB(void *reply, void *client, void *call_data);
+SmAddCallback(SmNconnectCallback, ConnectCB, 0); 
+],[
+    ac_ptrtype="void *"
+    AC_DEFINE(PTRTYPE,void *)
+],[
+    ac_ptrtype="caddr_t"
+    AC_DEFINE(PTRTYPE,caddr_t)
+])
+AC_MSG_RESULT([$ac_ptrtype])
+
+
+dnl
+dnl esound check
+dnl
+
+AC_ARG_WITH(esd,[  --with-esd              Enable support for Enlightenment Sound Daemon (optional)],
+            with_esd=yes, vv_config_libs=no)
+
+if test x$with_esd = xyes ; then
+    AC_CHECK_LIB(esd, esd_record_stream, true, AC_MSG_ERROR([Can't find libesd]))
+    AC_CHECK_HEADER(esd.h, true, AC_MSG_ERROR([Can't find esd.h]))
+    AC_DEFINE(HAVE_ESD)
+fi
+
+AM_CONDITIONAL(HAVE_ESD, test x$with_esd = xyes)
+
+dnl
+dnl arts check
+dnl
+
+AC_ARG_WITH(arts,[  --with-arts             Enable support for aRts sound daemon (optional)],
+            with_arts=yes, vv_config_libs=no)
+
+if test x$with_arts = xyes ; then
+    AC_CHECK_LIB(artsc, arts_record_stream, true, AC_MSG_ERROR([Can't find libartsc]))
+    AC_CHECK_HEADER(kde/artsc/artsc.h, true, AC_MSG_ERROR([Can't find artsc.h]))
+    AC_DEFINE(HAVE_ARTS)
+fi
+
+AM_CONDITIONAL(HAVE_ARTS, test x$with_arts = xyes)
+
+dnl
+dnl Test for gnome-config
+dnl
+AC_CHECK_PROG(GNOME_CONFIG, gnome-config, yes, no)
+if test "$GNOME_CONFIG" = "no"; then
+	AC_MSG_ERROR(*** gnome-config NOT found. Is gnome installed? ***)
+else
+	XV_GNOME_LIBS=`gnome-config --libs gnomeui`
+	XV_GNOME_CFLAGS=`gnome-config --cflags gnomeui`
+	XV_GNOME_VERSION=`gnome-config --version`
+fi
+
+dnl
+dnl Test for gtk-config
+dnl
+AC_CHECK_PROG(GTK_CONFIG, gtk-config, yes, no)
+if test "$GTK_CONFIG" = "no"; then
+	AC_MSG_ERROR(*** gtk-config NOT found. Is gtk+ installed? ***)
+else
+dnl	XV_GTK_LIBS=`gtk-config --libs`
+dnl	XV_GTK_CFLAGS=`gtk-config --cflags`
+	XV_GTK_VERSION=`gtk-config --version`
+fi
+
+dnl
+dnl Test for bash2 or zsh
+dnl
+AC_CHECK_PROG(USE_SHELL, bash2, bash2)
+
+if test "$USE_SHELL" = ""; then
+	AC_CHECK_PROG(USE_SHELL, zsh, zsh)
+fi
+
+dnl bash might be the right version
+if test "$USE_SHELL" = ""; then
+	AC_CHECK_PROG(USE_SHELL, bash, bash)
+	if test "$USE_SHELL" = "bash"; then
+		version="`bash -version -c true | grep 'version 2'`"
+		if test "$version" = ""; then
+			USE_SHELL=""
+		fi
+	fi
+fi
+
+if test "$USE_SHELL" = ""; then
+	AC_CHECK_PROG(USE_SHELL, sh, sh)
+fi
+
+if test "$USE_SHELL" = ""; then
+	AC_MSG_ERROR(*** bash2 or zsh must be installed on the system and in your PATH ***)
+fi
+
+dnl
+dnl Make sure we have a valid major GTK version
+dnl
+AC_MSG_CHECKING(if GTK+ version (1.2) is used)
+gtk_maj_rev=`echo $XV_GTK_VERSION | cut -f1-2 -d.`
+if test "$gtk_maj_rev" = "1.2" ; then
+	AC_MSG_RESULT(yes ($gtk_maj_rev))
+
+	dnl Make sure we have a valid minor GTK version
+	AC_MSG_CHECKING(if proper GTK+ revision is used)
+	gtk_min_rev=`echo $XV_GTK_VERSION | cut -f3 -d.`
+	min_ver_ok="F"
+
+	dnl if test "$gtk_min_rev" = "0"; then
+	dnl 	min_ver_ok="T"
+	dnl fi
+	dnl
+	dnl if test "$gtk_min_rev" = "1"; then
+	dnl 	min_ver_ok="U"
+	dnl fi
+
+	min_ver_ok="T"
+
+	if test "$min_ver_ok" = "T"; then
+		AC_MSG_RESULT(yes ($gtk_min_rev))
+	fi
+
+	if test "$min_ver_ok" = "U"; then
+		AC_MSG_RESULT(yes ($gtk_min_rev) untested)
+	fi
+
+	if test "$min_ver_ok" = "F"; then
+		AC_MSG_RESULT(no ($gtk_min_rev))
+		AC_MSG_RESULT(*** Error: gtk minor version revision ($gtk_min_rev) won't work with required Gtk-- ***)
+		AC_MSG_ERROR(See the README file on which versions of Gtk you need!)
+	fi
+else
+	AC_MSG_RESULT(no ($gtk_maj_rev))
+	AC_MSG_RESULT(*** Error: Gtk+ version ($gtk_maj_rev) < won't work ***)
+	AC_MSG_ERROR(Check the README file on which versions of Gtk+ you need!)
+fi
+
+
+dnl Are these C++ checks really necessary?
+
+dnl
+dnl make sure C++ compiler is powerful/complete enough
+dnl
+AC_MSG_CHECKING(if C++ compiler supports bool (required))
+AC_TRY_COMPILE(
+[
+],[
+   bool b=true;
+   bool b1=false;
+],[
+  ac_bool=yes
+],[
+  config_error=yes
+  AC_WARN(bool type is not supported by your compiler)
+])
+AC_MSG_RESULT([$ac_bool])
+
+dnl AC_MSG_CHECKING(if C++ environment has working string class (required))
+dnl AC_TRY_LINK(
+dnl [
+dnl #include <string>
+dnl   class foo {
+dnl   public:
+dnl     void f(const string &s);
+dnl   };
+dnl   void foo::f(const string &s) {
+dnl     f(s.c_str());
+dnl   }
+dnl ],[
+dnl    foo f1;
+dnl    f1.f("test");
+dnl ],[
+dnl   gtkmm_string_ok=yes
+dnl ],[
+dnl   gtkmm_string_ok=no
+dnl   config_error=yes
+dnl   AC_WARN(C++ compilers string support does not work)
+dnl ])
+dnl AC_MSG_RESULT([$gtkmm_string_ok])
+
+dnl
+dnl check if the previous C++ tests went OK
+dnl
+AC_MSG_CHECKING(if C++ environment provides all required features)
+if test "x$config_error" = xyes ; then
+  AC_MSG_RESULT([no])
+  AC_WARN(*** )
+  AC_WARN(*** Your compiler is not powerful enough to compile ***)
+  AC_WARN(*** xvoice. See the configure output and log for    ***) 
+  AC_WARN(*** details.                                        ***)
+  AC_WARN(*** )
+  AC_MSG_ERROR(Config error - exiting ...)
+fi
+AC_MSG_RESULT([yes])
+
+
+AC_SUBST(XV_CFLAGS)
+AC_SUBST(XV_CXXFLAGS)
+dnl AC_SUBST(XV_GTK_CFLAGS)
+dnl AC_SUBST(XV_GTK_LIBS)
+AC_SUBST(XV_GNOME_CFLAGS)
+AC_SUBST(XV_GNOME_LIBS)
+AC_SUBST(XV_VV)
+AC_SUBST(XV_VV_LIBS)
+
+AC_OUTPUT(Makefile \
+	src/Makefile \
+	src/expat/Makefile \
+	xvoice.spec)

@@ -1,0 +1,98 @@
+XVoice
+
+Version 0.8, Thu Mar  9 14:17:37 PST 2000
+by Brian Craft, while Tom is tied up on other things.
+http://www.thecraftstudio.com/bcboy/xvoice
+bcboy@thecraftstudio.com
+
+Version 0.6, Nov 25, 1999.
+http://www.compapp.dcu.ie/~tdoris/Xvoice
+Tom Doris
+tdoris@compapp.dcu.ie
+
+Versions previous to 0.5 by:
+http://www.zachary.com/creemer/xvoice.html
+David Z. Creemer
+david@zachary.com
+
+XVoice accepts contuinuous speech input from IBM's ViaVoice runtime for Linux,
+and then retarget the resulting text at many X applications. It uses the
+XTest extension to accomplish this.
+
+Speech input can be commands, such as "delete three lines", or dictation, such
+as "You sent the attachment in Microsoft Word format, a secret proprietary
+format, so I cannot read it." XVoice will map commands to key and mouse events,
+as specified in the configuration file. It will map dictation to equivalent key
+events, as if you had typed it. Command mode and dictation mode can be enabled
+independently.
+
+The ViaVoice engine requires some environment variables to be set. XVoice will
+attempt to bootstrap the environment by invoking vvsetenv (shipped with the
+ViaVoice run-time kit) and restarting. If this fails you need to set up your
+environment by executing the following in your (bourne syntax) shell:
+
+shell% . vvsetenv
+
+XXX -- Is the following true? or just an XSendEvent relic?
+
+In order to get emacs to work, you _must_ evaluate the following
+elisp:
+
+(setq x-allow-sendevents t)
+
+BUILDING
+
+XVoice requires X, ViaVoice SDK, GTK+, and libgnomeui to build. Some of the
+code is based on the IBM ViaVoice SDK sample "gtkhello". If you can build that
+sample program, you can build XVoice. See the Makefile for local settings.
+
+RUNNING
+
+"xvoice -h" will show you help on running the application.
+
+"xvoice -m" starts XVoice with the microphone ON.
+
+XVoice
+
+xvoice actively tracks the focus window and loads whatever grammars it finds
+for that window. It also keeps a history of any context grammars that were
+loaded, so if the focus changes the context grammars can be automatically
+reloaded when the window is re-focused. "command mode" and "dictate mode" may
+be used to control which vocabularies are loaded.
+
+Once started, XVoice presents a list of currently active vocabularies,
+a list of recognised words (initially blank), and the current target
+application (initially blank). Focus a target with the mouse, or by
+saying "next window" until the desired application is focused, and say
+"command mode" or "dictate mode" to begin sending voice commands.
+Say "stop command" or "stop dictate" to stop each mode.
+
+"Microphone off" will turn off the microphone.
+
+While dictating into an application, speaking "stop dictation" will
+return to XVoice command mode. Speaking "correction" will erase the
+last dictated word or punctuation. You may erase words back to the
+beginning of the dictation session. Speaking "new paragraph" will
+enter a single CR for you (i.e. "enter").
+
+Speaking "command mode" will put Xvoice into application command mode.  Xvoice
+will attempt to find the grammar file for the focused window, and use this as
+the current grammar. The xvoice.xml file contains mappings from spoken text to
+synthesisted X events. Thus it is possible to speak "open file" and have the
+key sequence "C-x C-f" sent to emacs. It is possible for users to modify the
+xvoice.xml file to incorporate key sequences for other applications.  This
+procedure is described in the COMMANDS file.
+
+COPYRIGHT
+
+Long Version:
+
+XVoice is Copyright (c) 1999, 2000, 2001, 2002 by David Z. Creemer, Tom Doris,
+Brian Craft, Jessica Heckman, Deborah Kaplan.
+
+All rights not granted in the LICENSE file are reserved. XVoice is distributed
+subject to the terms explained in the LICENSE file. Portions of this program
+are based on code from other projects, which use the GPL and other licenses.
+All attributions are in the AUTHORS file.
+
+Short Version: GPL.

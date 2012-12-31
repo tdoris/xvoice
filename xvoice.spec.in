@@ -1,0 +1,50 @@
+%define prefix /usr
+
+Summary: Voice controlled X
+Name: xvoice
+Version: @VERSION@
+Release: 1
+Copyright: GPL
+Group: Applications
+Source: http://prdownloads.sourceforge.net/xvoice/%{name}-%{version}.tar.gz
+URL: http://xvoice.sourceforge.net
+Packager:  Brian Craft <bcboy@thecraftstudio.com>
+BuildRoot: /var/tmp/%{name}-%{version}-root
+
+%description
+XVoice uses IBM's ViaVoice libraries to provide voice control for X
+applications.  Currently its UI is based on Gnome/GTK+.
+
+%changelog
+* Fri Apr  2 2004  Wes Hardaker <hardaker@users.sourceforge.net>
+- Second changelog entry, much more than a second RPM relase
+
+* Fri Mar 10 2000  Brian Craft <bcboy@thecraftstudio.com>
+- First RPM release.
+
+%prep
+%setup
+
+%build
+./configure --prefix=/usr --with-esd
+make
+
+%install
+rm -fr $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -fr $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%doc README TODO NEWS INSTALL COPYING ChangeLog AUTHORS COMMANDS
+%{prefix}/bin/xvoice*
+%{prefix}/bin/wmvoice
+%{prefix}/share/xvoice
+%{prefix}/share/pixmaps/xvoice.png
+%{prefix}/lib/libxvesd.so
+%{prefix}/lib/libxvesd.so.0
+%{prefix}/lib/libxvesd.so.0.0.0
+%{prefix}/lib/libxvesd.la
+/usr/lib/ViaVoice/bin/libxvesd.so

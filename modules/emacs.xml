@@ -1,0 +1,50 @@
+<xvoice>
+  <application name='emacs' expr='X?emacs.*' enableOn="emacs"><![CDATA[
+    INCLUDE "numbers.bnf"
+    INCLUDE "keys.bnf"
+    INCLUDE "emacsediting.bnf"
+        <emacsstuff> =
+                news     ->   <key char='x' control='true'/>
+                                <key char='b*Group*'/>
+                                <key char='&Return;'/>
+
+		|open file ->	<key char='x' control='true'/>
+			<key char='f' control='true'/>
+		|delete buffer ->	<key char='x' control='true'/>
+			<key char='k'/>
+		|new line and indent ->	<key char='j' control='true'/>
+		|next line ->	<key char='n' control='true'/>
+		|previous line ->	<key char='p' control='true'/>
+		|suspend emacs ->	<key char='z' control='true'/>
+		|shell command ->	<key char='!' alt='true'/>
+		|spell word ->	<key char='\$' alt='true'/>
+		|directory listing ->	<key char='x' control='true'/>
+			<key char='d' />
+		|count lines in page ->	<key char='x' control='true'/>
+			<key char='l' />
+		|compose mail ->	<key char='x' control='true'/>
+			<key char='m'/>
+		|send mail ->	<key char='c' control='true'/>
+			<key char='s' control='true'/>
+		|other window ->	<key char='x' control='true'/>
+			<key char='o' />
+		|save some buffers ->	<key char='x' control='true'/>
+			<key char='s' />
+		|compile ->	<key char='x' control='true'/>
+			<key char='z' control='true'/>
+                |next error -> <key char='x' control='true'/>
+			<key char='`'/>
+		|browse the web ->	<key char='x' alt='true'/>
+			<key char='w3\\r'/>
+		|open location ->	<key char='o' control='true'/>
+		|widget ->	<key char='x'  alt='true'/>
+		|start section ->	<key char='cs' control='true'/>
+		|boldface font ->	<key char='cfb' control='true'/>
+		|slanted font ->	<key char='cfs' control='true'/>
+		|emacs ->	<key char='emacs'/>
+            .
+
+	<<root>> = <emacsediting> | <emacsstuff>
+        .
+  ]]>   </application>
+</xvoice>

@@ -1,0 +1,91 @@
+<xvoice>
+        <!-- For example:
+             three fifteen, five oh one, fifteen hundred,
+             fifteen hundred thirty, fifteen hundred one,
+             eighteen twenty,  nineteen oh two, oh two,
+             oh eight hundred (as in 24 hour time),
+             point oh oh seven five, ten point oh nine, five point
+             three, three tenths, six and nine tenths, four one
+             hundredths, three thousandths
+             -->
+
+    <define name='numbers'> <![CDATA[
+        <one-digit> = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 .
+
+        <two-digit> = {<one-digit>} {<one-digit>} -> {1}{2}
+            | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
+            | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29
+            | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39
+            | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49
+            | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59
+            | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69
+            | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79
+            | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+            | 90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 .
+
+        <three-digit> = {<one-digit>} hundred ->     {1}00
+            | {<one-digit>} hundred {<two-digit>} -> {1}{2}
+            | {<one-digit>} hundred {<one-digit>} -> {1}0{2}
+            | {<one-digit>} {<two-digit>} ->         {1}{2} .
+
+        <four-digit> = {<two-digit>} hundred ->         {1}00
+            | {<two-digit>} hundred {<two-digit>} ->    {1}{2}
+            | {<two-digit>} hundred {<one-digit>} ->    {1}0{2}
+            | {<two-digit>} {<two-digit>} ->            {1}{2}
+            | {<one-digit>} thousand ->                 {1}000
+            | {<one-digit>} thousand {<one-digit>} ->   {1}00{2}
+            | {<one-digit>} thousand {<two-digit>} ->   {1}0{2}
+            | {<one-digit>} thousand {<three-digit>} -> {1}{2} .
+
+        <five-digit> = {<two-digit>} thousand ->        {1}000
+            | {<two-digit>} thousand {<one-digit>} ->   {1}00{2}
+            | {<two-digit>} thousand {<two-digit>} ->   {1}0{2}
+            | {<two-digit>} thousand {<three-digit>} -> {1}{2} .
+
+        <six-digit> = {<three-digit>} thousand ->         {1}000
+            | {<three-digit>} thousand {<one-digit>} ->   {1}00{2}
+            | {<three-digit>} thousand {<two-digit>} ->   {1}0{2}
+            | {<three-digit>} thousand {<three-digit>} -> {1}{2} .
+
+        <seven-plus-digit> = {<one-digit>|<two-digit>|<three-digit>}
+million -> {1}000000
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<one-digit>} ->  {1}00000{2}
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<two-digit>} ->  {1}0000{2}
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<three-digit>} ->{1}000{2}
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<four-digit>} -> {1}00{2}
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<five-digit>} -> {1}0{2}
+            | {<one-digit>|<two-digit>|<three-digit>} million
+{<six-digit>} ->  {1}{2} .
+
+        <raw-number> =
+{<one-digit>|<two-digit>|<three-digit>|<four-digit>|<five-digit>|<six-digit>|<seven-plus-digit>}
+.
+
+        <number> = {<raw-number>} -> <key char='{1}' /> .
+
+        <point-decimal> = (point|dot)
+{<one-digit>|<two-digit>|<three-digit>|<four-digit>} -> \.{1} .
+
+        <nth-decimal> = {<one-digit>} (one)? (tenth|tenths) ->   \.{1}
+            | {<one-digit>} (one)? (hundredth|hundredths)   ->   \.0{1}
+            | {<two-digit>} (one)? (hundredth|hundredths)   ->   \.{1}
+            | {<one-digit>} (one)? (thousandth|thousandths) ->   \.00{1}
+            | {<two-digit>} (one)? (thousandth|thousandths) ->   \.0{1}
+            | {<three-digit>} (one)? (thousandth|thousandths) -> \.{1}
+.
+
+        <raw-real-number> =  {negative -> -}? {<raw-number>} -> {1}{2}
+            | {negative -> -}? {<raw-number>} and {<nth-decimal>} -> {1}{2}{3}
+            | {negative -> -}? {<raw-number>} {<point-decimal>} -> {1}{2}{3}
+            | {negative -> -}? {<point-decimal>} -> {1}{2}
+            | {negative -> -}? {<nth-decimal>} -> {1}{2} .
+
+        <real-number> = {<raw-real-number>} -> <key char='{1}' /> .
+
+    ]]> </define>
+</xvoice>

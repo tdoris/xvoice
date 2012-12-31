@@ -1,0 +1,17 @@
+<xvoice>
+    <vocab name='mouse' enableOn='mouse' alwaysOn='true'> <![CDATA[
+INCLUDE "numbers.bnf"
+        <<root>> = 
+      click button -> <mouse button='1'/>
+    | double click button -> <mouse button='1' action='double click'/>
+    | triple click button -> <mouse button='1' action='triple click'/>
+
+    | mouse down -> <mouse button='1' action='down'/>
+    | mouse up -> <mouse button='1' action='up'/>
+    | triple click button -> <mouse button='1' action='triple click'/>
+
+    | move mouse {<number>} left -> <mouse origin='relative' x='-{1}' y='0' />
+    | move mouse {<number>} down -> <mouse origin='relative' x='0' y='{1}' />
+    .
+    ]]> </vocab>
+</xvoice>

@@ -1,0 +1,16 @@
+<xvoice>
+    <vocab name='Casing and Spacing' enableOn='space case' 
+     alwaysOn='application'> <![CDATA[
+        <<root>> =
+             NO-SPACE -> <setSpace name='no-space'/>
+            |no spaces -> <setSpace name='no-space' duration='continuous'/>
+            |normal spacing -> <setSpace name='normal' duration='continuous'/>
+            |Title Case -> <setCase name='TitleCase' duration='continuous'/>
+            |LOWERCASE -> <setCase name='Normal' duration='continuous'/>
+            |UPPERCASE ->  <setCase name='Uppercase' duration='continuous'/>
+            |Capitalize -> <setCase name='TitleCase'/>
+        .
+]]> </vocab>
+</xvoice>
+
+

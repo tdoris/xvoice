@@ -1,0 +1,335 @@
+The code has been fairly significantly warmed over between 0.6 and 0.8. Here's
+an outline of the new design & goals.
+
+- "Target" and "MainWin" have been abstracted a bit more, so that the core
+  code will eventually run on the console, as well. This means gtk/gnome
+  references are (or will be) isolated in gnomeMainWin.c. Also, the native
+  "event" structure is no longer an XEvent. This also allows us to have "grammar"
+  and other events which are unrelated to X. It is up to a "Target" to convert
+  to XEvent, or whatever.
+
+- EventStreams are generated on-the-fly, rather than at start-up. This allows us
+  to use BNF grammars, where non-terminals can be substituted by the ViaVoice
+  "translation" facility. E.g. it can fill in "27" in "move <number> lines down".
+
+- Voice.cc has been reworked into a fairly generic wrapper on top of ViaVoice.
+  Previously quite a bit of xvoice logic was down in the SMAPI callbacks, and
+  different xvoice facilities were special cased out (e.g. check the vocab name
+  for "windowmanagershortcuts", and do something different with it). Now the
+  calls and callbacks are generic. The wrapped API looks something like this.
+
+  Grammars are enabled or disabled by calling enableCommandGrammar() or
+  disableCommandGrammar() with the name of the grammar to enable, and a callback.
+  The callback is invoked if 1) enabling the grammar failed, 2) enabling the grammar
+  succeeded, or 3) a word was recognized.
+
+  The vocab API is basically the same, except the vocab words are passed in, and
+  Vocabs are currently never undefined. Also, the vocab API automatically does
+  lookups on words (analogous to "translations" for grammars), so the callback
+  can use a simple switch to handle recognised words.
+
+  A fair question is "Why another layer of callbacks? Is this actually any
+  simpler than hooking straight to SMAPI?" 
+
+  The advantages, as I see them, are
+
+    1) The wrapper provides per-vocabulary callbacks, rather than the per-process
+        callbacks provided by SMAPI. This is much more useful.
+
+    2) The wrapper deals with all the details like finding grammar files, handling 
+        low-level errors, looking up translations, etc., making the wrapped API 
+        much simpler.
+
+    3) This design allows different gui's to provide different commands w/o
+        modifying Voice.cc. It's extremely easy for a gui to register commands
+        specific to its windows.
+
+    4) It isolates the SMAPI dependencies, in case we ever want to try a different
+        voice engine.
+
+  In implementing callbacks for vocabs, I discovered that SMAPI doesn't actually
+  report the name of the vocab when a word is recognised (as it does with grammars).
+  This is bizzare. As a work around, Voice.cc currently searches all installed 
+  vocabs for the word. This is probably fine as long as we have only short vocabs. 
+  I suspect this will always be the case. Anything longer will likely end up in a 
+  grammar. If this proves false, Voice.cc should be changed to hash the vocab names 
+  for fast look-ups.
+
+What follows is the CODEGUIDE from 0.6, edited where things have changed.
+---------------------------------------------------------------------------------
+
+This document gives a general overview of the architecure of the XVoice
+program. It is intended for use by those who wish to modify and enhance the
+program. It does not give great technical detail concerning the program's
+operation - that can be gleaned from the source code and comments.  Xvoice sits
+on top of the ViaVoice for Linux engine. This engine provides an API to the
+program. Calls to the speech api are prefixed by "Sm". 
+
+These calls are marginally documented in the ViaVoice for Linux documentation.
+To quote one IBM employee, "The User's Guide is so out of date (and poorly
+written to begin with) it really needs to be re-written. Band-aids for now...".
+
+Calls may be synchronous or asynchronous. When they are synchronous, a reply
+structure must be provided.  The engine initates callbacks in the client
+(XVoice) code. These callbacks are to be found in "Voice.cc". A callback is
+simply the execution of a client-side function in response to a previous
+asynchronous call made by the client. 
+
+The gui is written in GTK and is implemented in the gnomeMainWin.cc file. It is
+straightforward GTK code - refer to GTK documentation if you want to modify the
+gui.  The MainWindow class also performs many tasks which can be initiated by
+user actions upon the gui - turning on the microphone etc.
+
+Under normal operation, Xvoice receives callbacks for recognised phrases from
+the speach to text engine. Parameters to the callbacks contain the text which
+was the result of the speech recognition. This text is then sent to the current
+target application. 
+
+Simulated X events are used to send the text. In BuildEvent and EventStream
+there are functions for creating X events and sending them to X applications.
+
+Applications known to xvoice, and the grammars they require, are defined in
+xvoice.xml. If you copy from the sample xvoice.xml, you can probably add
+new commands without knowing the details of what's going on. Here are details,
+in case you need them:
+
+The gross structure of the file is xml. Vocabularies and applications are
+defined in xml blocks, like <application> </application>. Each such block
+consists of a BNF grammar which is written to a .bnf file in ~/.xvoice/grammars, and
+compiled with the ViaVoice grammar compiler (to .fsg and .fst files).
+
+The BNF data consist of grammar elements followed by translations (which occur
+after the "->"). ViaVoice sends the translations to xvoice when it recognises a
+grammar element. xvoice expects translations in xml format.
+
+So... xvoice ONLY parses XML. ViaVoice ONLY parses BNF. xvoice.xml is read by
+xvoice so it can create the BNF grammar files. The grammar files are read by
+ViaVoice so it can recognise phrases and send translations to xvoice.  The
+translations are in XML so xvoice can easily convert them to XEvents, grammar
+events, etc.
+
+The code which handles the parsing process for Xvoice is in ParseEventStream.
+
+There are two main modes of operation - command mode and Dication mode -- which
+can be enabled independently.
+
+When in command mode the recognised phrases are returned to the RecoPhraseCB
+callback. The callback looks up the translation and passes it to the registered
+callback (usually appHandler()). The translations are then either passed to
+Voice.cc (for grammar events), or passed to the Target (for mouse/key events).
+
+When in dictation mode, the recognised text is sent to the RecoTextCB callback.
+A small number of checks are done for special sequences and the text is passed
+directly to the Target.
+
+While in other modes, dynamic vocabularies may still be active. These are
+necessary in order to ensure that when the user says "stop dictation" the app
+moves out of dictation mode. The appropriate callback is RecoWordCB.
+
+The Target.cc file models X applications using a simple class.
+
+--
+
+Information about the correction API:
+
+VOCABULARY
+
+edit: to modify the text in an application
+
+train: to train the recognition engine by applying a new spelling to a
+       misrecognized word
+
+correct: to edit and/or train
+
+word: atomic unit; a string that a) what the speech engine believes is
+      a word, as is stored in its vocabulary lists; or b) what the user
+      declares to be a word, by associating it with a WordInfo
+      object. Examples include "apple", "tai chi", or the macro
+      "Capitalize Next." Note that a word can contain spaces, or can
+      be associated with a command instead of a string.
+
+voice buffer: the text which xvoice believes to be in the current
+      application, and which xvoice can control. Examples: a) if the
+      user dictates "the quick brown fox", and then uses the keyboard to
+      delete "quick", the voice buffer is "the quick brown fox", even
+      though that string does not correspond to what is in the
+      application. b) If the user dictates "the quick [Save That]
+      brown fox", the voice buffer is "brown fox", since xvoice cannot
+      modify text previous to the command to "save that".
+
+***
+
+WordInfoQueue (inherits LinkedList)
+
+ summary:
+  A class for maintaining a linked list of WordInfo objects and
+    metadata about them.
+
+ public methods:
+  WordInfoQueue *new(): constructor
+  void delete(): destructor
+  WordInfo *wordInfo(): return the WordInfo object to which this
+    object refers
+  WordInfoQueue *next()
+  WordInfoQueue *prev()
+  bool editable(): if this WordInfo is modified, can the application
+    with which it is associated be notified of that change?
+  void edit_letters(char *letters): set the edited spelling of this
+    word [Explain this better. Deb: should this be in WIQ?]
+
+ public fields:
+  long index: indicates order in which this word was created relative
+    to all WordInfos which exist. [Note: Deborah will add the
+    information about where this field is used.]
+
+***
+
+WordInfoQueueHead
+ summary: a class for managing a list of WordInfoQueues. Restriction:
+   a WordInfoQueue may not belong to more than one
+   WordInfoQueueHead. Attempting to create a WordInfoQueueHead
+   pointing to WordInfoQueue(s) which are already parented will
+   produce an error.
+
+ public methods:
+  WordInfoQueue *newest(): return the newest WIQ in the list.
+  WordInfoQueue *oldest(): return the oldest WIQ in the list.
+  int maxLength(): return the maximum length of this queue before it
+   should be reaped (garbage-collected).
+  int length(): return the current length of this queue.
+  int doGC(): remove the appropriate number of WordInfoQueues from the
+   queue in order to remain at or maxLength. Return the number
+   removed.
+  int remove(int index): remove the indexth newest WIQ.
+  int remove(int from, int to): remove the WIQs beginning at the
+   from-th newest through the to-th newest.
+
+***
+
+WordInfo
+
+ summary: Information about a recognized "word" (see the definition of
+   "word" in the above vocabulary).
+ implementation notes: many of these methods will probably cache, on
+   account of expensive engine interactions.
+
+ public methods:
+  WordInfo *new(char *spelling): constructor. Takes initial spelling
+    of word.
+  void delete(): destructor
+  int length(): return the number of characters in this word
+  char **get_alternates(): return a list of strings of alternate
+    possibilities for this word.
+  char *get_letters(): return the characters in this word: its
+    spelling.
+  void set_letters(char *letters): set the spelling of this word.
+  bool trainable(): can this particular WordInfo be trained? Reasons
+    it might not include: implemented with an engine which does not
+    train; entered by hand and not associated with any pronunciation.
+  // add bool command here in the future?
+  // add vocab_info getter here in the future?
+
+***
+
+SMAPIWordInfo (inherits WordInfo)
+ summary: a class which implements WordInfo for the SMAPI. Meant to be
+   used only in SMAPI-specific code.
+
+ public methods:
+  WordInfo *new(char *spelling, long tag)
+
+ private fields:
+  long tag: may be void
+  char *spelling
+  int wordLength
+  char *edited_spelling
+
+***
+
+Corrector
+
+ dependencies: WordInfo, WordInfoQueue
+
+ public methods:
+  Corrector *new(WordInfoQueueHead *wordList, WordInfoQueue *newest,
+    WordInfoQueue *oldest): constructor. Takes a WIQH, and two WIQs
+    which delineate points within it which will be treated as ends of
+    the list of words to be handled. No WordInfos newer than newest or
+    older than oldest will be modified in any way by this
+    Corrector. Restriction: the WordInfoQueues must be in the list
+    pointed to by the WordInfoQueueHead (wordList).
+  void delete(): destructor
+  char **get_alternate(int index): get the alternates list for the
+    indexth newest word in the list of words handled by this object.
+  void edit_word(int index, char *correct_spelling, Window *win):
+    replace the specified word in the specified application with a new
+    spelling, presumably by sending the appropriate set of backspaces
+    and new keystrokes; saves this change in xvoice's representation
+    of the voice buffer (see the definition of "voice buffer" in the
+    vocabulary). [Note: make less GUI-specific by not using Window.]
+  void train_word(int index, char *new_spelling): interact with the
+    engine to "train" it that the word it misheard at the indexth
+    newest point in this list of words was actually spelled
+    as specified by new_spelling.
+  void add_word(int index, WordInfo *word): add word at the indexth
+    newest point in this WordInfoQueueHead.
+  WordInfo *create_word(char *spelling)
+  void move_word(int from_index, int to_index): if from_index and
+    to_index are legal, move the from_indexth newest word in the list
+    to the to_indexth newest spot.
+
+***
+
+SMAPICorrector (inherits Corrector)
+
+ summary:
+  Implements Corrector for the SMAPI.
+
+***
+
+
+CorrectionUI
+
+ dependencies: Corrector. Note that objects in this class will create
+   a Corrector object and pass significant amounts of processing to it.
+
+ public methods:
+  CorrectionUI *new(WordInfoQueueHead *wordList, WordInfoQueue
+    *newest, WordInfoQueue *oldest, Window *current_application):
+    constructor
+  void delete(): destructor
+
+ protected methods:
+  void display_alternates(int index): display a list of alternates for
+    the indexth newest word in the list
+  void edit_word(int index, char *correct_spelling, Window *win):
+    request that the Corrector replace the specified word in the
+    specified application with a new spelling, presumably by sending the
+    appropriate set of backspaces and new keystrokes.
+  void train_word(int index, char *new_spelling): request that the
+    Corrector "train" the engine that the word it misheard at the
+    indexth newest point in this list of words was actually spelled
+    as specified by new_spelling.
+  void add_word(WordInfo *word, int index): request that the Corrector
+    add word at the indexth newest point in this word list.
+  void move_word(int from_index, int to_index): if from_index and
+    to_index are legal, request that the Corrector move the
+    from_indexth newest word in the list to the to_indexth newest spot.
+
+ private:
+   Corrector *corrector
+
+***
+
+CorrectionBoxGUI (inherits CorrectionUI)
+ public methods:
+  CorrectionBoxGUI *new(): constructor
+  void delete(): destructor
+
+***
+
+CorrectionBoxGUI_GTK (inherits CorrectionBoxGUI)
+ public methods:
+  CorrectionBoxGUI_GTK *new(): constructor
+  void delete(): destructor
+
